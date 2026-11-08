@@ -1,0 +1,107 @@
+# うまい話チェック アプリ（MVP）
+
+教材『AI投資部、今日から出社。投資編』「17 うまい話チェック係」と巻末の「うまい話チェック表」（9分類・41項目）を、そのまま使えるウェブアプリ（PWA）にしたものです。仕様は `SPEC.md`、項目データは `checklist_items.json` が正です。
+
+- 人から勧められた投資の話を、**お金を払う前に** 41項目で点検する
+- 赤（やめる）／黄（確かめるまで払わない）／青（大きな問題は見つからなかった）の **判定の1枚** と証拠（URL・スクリーンショット・引用）を残す
+- データは **端末の中（IndexedDB）だけ**。サーバーには送らない。ログインなし
+- AIは組み込まない（仕様 D2）。依頼文を作ってコピー → 好きなAIに貼る → 答えを貼り戻して取り込む
+
+## 動かし方
+
+```bash
+npm install --legacy-peer-deps
+npm run dev          # 開発サーバー
+npm test             # 単体テスト（Vitest）
+npm run build        # 型チェック＋本番ビルド（dist/）。静的ホスティングに置く
+npm run preview      # ビルドしたものを確かめる
+npm run check-links  # config/links.json のURLが開くか（ネットにつながる環境で人が実行）
+```
+
+`npm install` が `Cannot read properties of null (reading 'edgesOut')` で止まる場合は npm 10 の既知の不具合です。`--legacy-peer-deps` を付けてください。
+
+## フォルダ
+
+| 場所 | 中身 |
+|---|---|
+| `checklist_items.json` | 41項目＋追加提案 X-1〜X-4（正のデータ） |
+| `config/links.json` | 調べる場所のURL（手引き1〜6）。基準日つき |
+| `config/contacts.json` | 相談先の電話番号。基準日つき |
+| `config/keywords.json` | 自動の気づきの言葉（仕様 4.6） |
+| `config/seller.json` | 販売者情報（未記入があると「開発版」の帯が出る） |
+| `config/guides.json` | 調べ方の手引き1〜9の本文 |
+| `config/rules.json` | 項目IDに結びついたルール（4-2→4-4の連動、9-3、4-3 など。仕様 6.3） |
+| `prompts/*.md` | AIへの依頼文のテンプレート（`{{key}}` 差し込み） |
+| `demo/gold-ai-plan.json` | 原本の通しの例「ゴールドAIプラン」のデモデータ |
+| `scripts/check-links.mjs` | リンク切れ確認（仕様 8.5） |
+| `src/logic/` | 判定ロジック（verdict）、自動の気づき（hints）、取り込み（importers）、依頼文（prompts）、判定の1枚（sheet）、検索の言葉（search）、過去案件の照合（crossref）、断定語の検査（forbidden） |
+| `src/app/` | IndexedDB（Dexie）、案件のコンテキスト（自動保存）、ZIP書き出し・読み込み |
+| `src/screens/` | S0〜S9 の画面 |
+| `src/test/` | 受け入れ条件（仕様 12章）に対応するテスト |
+
+## 画面と原本の対応
+
+| 画面 | 原本 | ルート |
+|---|---|---|
+| S0 ホーム（一覧・横断検索・新規・すでに払った人へ） | — | `#/` |
+| S1 案件カード | ステップ1 | `#/case/:id/card` |
+| S2 AI下調べ | ステップ2 | `#/case/:id/research` |
+| S3 チェック表（分類1〜9） | ステップ3〜5 | `#/case/:id/check?cat=N` |
+| S4 見落としチェック | ステップ6 | `#/case/:id/review` |
+| S5 判定の1枚（確定・版・印刷・ZIP） | ステップ7 | `#/case/:id/sheet` |
+| S6 このあとどうするか | ステップ8 | `#/case/:id/next` |
+| S7 すでに払ってしまった | ステップ8後半 | `#/case/:id/paid`、`#/paid` |
+| S8 調べ方の手引き | 手引き1〜9 | `#/guides/:guideId` |
+| S9 設定・このアプリについて | — | `#/settings` |
+
+## 「決めること」は既定で進めました（仕様 2章）
+
+| # | 決めたこと |
+|---|---|
+| D1 | 4-3（登記簿）を見ない場合は「該当なし（有料のため未確認）」＝青扱い。判定の1枚に「登記簿は未確認」と注記 |
+| D2 | AIは組み込まない。依頼文のコピー → 答えの貼り戻し |
+| D3 | 追加項目 X-1〜X-4 は無効。設定で有効化できる |
+| D4 | PWA（ホーム画面に置ける・オフラインで動く）。ログインなし。端末の中だけに保存 |
+| D5 | 日本語のみ |
+| D6 | 販売者情報は `config/seller.json`。未記入なら「開発版」の帯 |
+
+## 仕様からの違い・補ったところ
+
+- `maskWords` は仕様では `string[]` ですが、置き換え先の表示（【自分の名前】など）を持たせるため `{ word, label }[]` にしました。古い形（文字列）も読み込み時に変換します。
+- `Case` に `researchStatus`（ステップ2を省略したか）、`attachments`（案件カードに添付した画像）、`review.findings`（指摘の本文）、`ItemResult.ai`（AI下調べの結果を判定とは別に残す欄）を足しました。
+- 赤・該当なし・4-4の青は、**判定を選ぶその場で** 条件（証拠・手がかり2つ・理由・前の名前の再確認）を確かめて止めます。「確認した人＝自分」と仮判定の解消は **確定時** に止めます（仕様 12.3 の言い方に合わせました）。
+- 判定の1枚の黄の一覧は、A4 1枚に収めるため最大8件＋「ほか◯件」にしています（`config/rules.json` の `maxYellowsOnSheet`）。
+- 判定の1枚は画面表示・印刷・ZIPの `判定の1枚.html`・版の保存で **同じHTML** を使います（iframe で表示）。
+- ルーティングはハッシュ（`#/…`）です。どの静的ホスティングでもリロードで404になりません。
+- 原本の依頼文（ステップ1・2・6）の本文は手元にないため、仕様の記述に沿って書き起こしました。`prompts/` を直せば差し替えられます。手引き1〜9の本文（`config/guides.json`）も同様です。
+
+## 受け入れ条件（仕様 12章）の確かめ方
+
+| # | 条件 | 確かめ方 |
+|---|---|---|
+| 1 | 原本の通しの例が再現できる | `src/test/demo.test.ts`。ホームまたは設定の「デモの案件を読み込む」でも見られる（全体判定：赤、赤の上位3つ：1-1・1-2・1-3、結論の1文） |
+| 2 | 自動の気づき | `src/test/hints.test.ts` |
+| 3 | 判定ロジックの単体テスト | `src/test/verdict.test.ts` |
+| 4 | AIの答えの取り込み | `src/test/importers.test.ts` |
+| 5 | 幅375pxで横にはみ出さない | Playwright で全画面を確認済み（開発時） |
+| 6 | 機内モードでも動く | PWA（Workbox）で全ファイルを事前キャッシュ。外のサイトだけ開けない |
+| 7 | ZIPを全削除後に読み込むと同じ内容に戻る | `src/test/exportImport.test.ts` |
+| 8 | 断定する文言が出ない | `src/test/forbidden.test.ts`（src・config・prompts・demo の全文と、生成した判定の1枚・依頼文を検査） |
+
+## リリース前に人が行うこと（仕様 8.5）
+
+- [ ] `npm run check-links` で `config/links.json` の全URLが開くこと
+- [ ] `config/contacts.json` の電話番号・受付時間を各役所の公式ページで確認
+- [ ] `config/seller.json` の販売者情報（代表者・登録番号・業務の種別・加入協会・問い合わせ先・代金）を埋める
+- [ ] `prompts/*.md` と `config/guides.json` を原本の文言と照らし合わせる
+
+## ブラウザで開けるようにする（GitHub Pages で公開）
+
+`.github/workflows/deploy.yml` が入っているので、GitHub に置くだけで自動で公開されます。
+
+1. GitHub で新しいリポジトリを作る（Public）。名前は例：`umai-hanashi-check`
+2. リポジトリの Settings → Pages → Build and deployment の Source を **GitHub Actions** にする
+3. このフォルダを push する（下の手順）
+4. 数分後に `https://＜GitHubのユーザー名＞.github.io/＜リポジトリ名＞/` で開ける。スマホの「ホーム画面に追加」でアプリのように使える
+
+ビルド時に `BASE_PATH=/＜リポジトリ名＞/` が自動で付きます。独自ドメインや別のホスティング（Netlify・Cloudflare Pages など）では `BASE_PATH` なしで `npm run build` した `dist/` を置けば動きます。

@@ -1,0 +1,667 @@
+{
+  "id": "demo-gold-ai-plan",
+  "createdAt": "2026-10-15T09:00:00+09:00",
+  "updatedAt": "2026-10-15T13:00:00+09:00",
+  "investigator": "デモ（教材の通しの例）",
+  "card": {
+    "caseName": "ゴールドAIプラン",
+    "companyNames": [
+      "合同会社ミライ架空キャピタル",
+      "Mirai Fictional Capital LLC",
+      "ミライキャピタル"
+    ],
+    "claimedRegistrationNo": "関東財務局長（金商）第9999号",
+    "companyAddress": "東京都港区架空1-2-3 架空ビル5F",
+    "companyPhone": "03-0000-0000",
+    "representative": "架空 太郎",
+    "introducer": {
+      "name": "ユウキ",
+      "snsNames": [
+        "yuki_fx_life"
+      ],
+      "relation": "InstagramのDMで知り合った（会ったことはない）"
+    },
+    "urls": [
+      "https://mirai-fictional-capital.example/"
+    ],
+    "payee": {
+      "accountName": "カクウ タロウ",
+      "bank": "架空銀行 新橋支店 普通 1234567",
+      "cryptoAddresses": []
+    },
+    "amount": "50万円",
+    "promisedReturn": "月利8%、元本保証。損失はこちらで補填するので、損はしません",
+    "withdrawal": "出金のときは手数料として利益の20%を先に振り込んでもらう",
+    "receivedAt": {
+      "date": "2026-10-10",
+      "channel": "InstagramのDM → LINE"
+    },
+    "deadline": "2026-10-17（今週の金曜日）",
+    "notablePhrases": [
+      "月利8%、元本保証です。",
+      "家族に話すと反対されるから、決めてから話したほうがいいですよ。",
+      "友達を紹介すると、その人の入金額の10%がもらえます。"
+    ]
+  },
+  "rawMessages": "ユウキ：山田花子さん、こんにちは！先日お話しした「ゴールドAIプラン」の資料を送りますね。\nユウキ：運営は合同会社ミライ架空キャピタル（Mirai Fictional Capital LLC）です。関東財務局長（金商）第9999号を取っているので安心です。\nユウキ：代表の架空太郎さんは元大手証券のトレーダーで、AIが自動で金を売買します。月利8%、元本保証です。\nユウキ：知識がなくても誰でもできます。ほったらかしでOK。\n山田花子：すごいですね。でも元本保証って大丈夫なんですか？\nユウキ：損失はこちらで補填するので、損はしません。実績の画像を送ります。\nユウキ：今回の枠は今週の金曜日で締め切りです。残り3枠。\nユウキ：振込先：架空銀行 新橋支店 普通 1234567 カクウ タロウ\nユウキ：家族に話すと反対されるから、決めてから話したほうがいいですよ。\nユウキ：友達を紹介すると、その人の入金額の10%がもらえます。\n山田花子：出金はいつでもできますか？\nユウキ：出金のときは手数料として利益の20%を先に振り込んでもらう決まりです。それ以外は自由です。\nユウキ：質問が多いですね…疑うなら、やらなくても大丈夫ですよ。\nユウキ：サイトはこちら https://mirai-fictional-capital.example/ 問い合わせはLINEのみです。",
+  "maskWords": [
+    {
+      "word": "山田花子",
+      "label": "【自分の名前】"
+    }
+  ],
+  "items": {
+    "1-1": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "金融事業者一括検索と金融商品取引業者の一覧（PDF）で「ミライ架空キャピタル」「Mirai Fictional Capital」「ミライキャピタル」を検索。どれも載っていない。お金を集めて運用する話なのに登録がない。",
+      "urls": [
+        {
+          "url": "https://search.fsa.go.jp/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        },
+        {
+          "url": "https://www.fsa.go.jp/menkyo/menkyoj/kinyushohin.pdf",
+          "viewedAt": "2026-10-15T11:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "1-2": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "名乗っている「関東財務局長（金商）第9999号」は、一覧では別の会社の番号。名前・住所・電話がすべて違う（番号だけ借りたなりすまし）。",
+      "urls": [
+        {
+          "url": "https://www.fsa.go.jp/menkyo/menkyoj/kinyushohin.pdf",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "1-3": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "第9999号の持ち主の業務の種別は「投資助言・代理業」だけ。お金を預かって運用する（投資運用業）話には合わない。",
+      "urls": [
+        {
+          "url": "https://www.fsa.go.jp/menkyo/menkyoj/kinyushohin.pdf",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "1-4": {
+      "verdict": "na",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "naReason": "国内の合同会社を名乗っている（海外の会社ではない）ため"
+    },
+    "1-5": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "特例業務届出者の一覧に、会社名・代表者名ともに載っていない。業務廃止命令・「連絡が取れない」の一覧にもなし。",
+      "urls": [
+        {
+          "url": "https://www.fsa.go.jp/menkyo/menkyoj/tokurei.html",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "2-1": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "現在の名前「合同会社ミライ架空キャピタル」「Mirai Fictional Capital」では載っていない。似た名前も確認。前の名前は4-4で赤。",
+      "urls": [
+        {
+          "url": "https://www.fsa.go.jp/ordinary/chuui/mutouroku.html",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "reviewed": true,
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "2-2": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "暗号資産の無登録業者への警告（国内・海外）に会社名なし。暗号資産を使う話でもない。",
+      "urls": [
+        {
+          "url": "https://www.fsa.go.jp/policy/virtual_currency/angoushisan_mutouroku_j.pdf",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "reviewed": true,
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "2-3": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "証券取引等監視委員会の申立て・報道発表に、会社名・代表者名・前の名前はなし。",
+      "urls": [
+        {
+          "url": "https://www.fsa.go.jp/sesc/actions/moushitate.html",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "reviewed": true,
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "2-4": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "消費者庁の特定商取引法の処分一覧に、会社名・代表者名・前の名前はなし。",
+      "urls": [
+        {
+          "url": "https://www.no-trouble.caa.go.jp/action/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "reviewed": true,
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "2-5": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "国民生活センターの注意喚起（SNSで知り合った相手からの「AI自動売買」「元本保証」の勧誘）と流れがそっくり。",
+      "urls": [
+        {
+          "url": "https://www.kokusen.go.jp/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "reviewed": true,
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "3-1": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "I-SCANで「Mirai Fictional Capital」「Next Fictional Trade」ともに載っていない。",
+      "urls": [
+        {
+          "url": "https://www.iosco.org/i-scan/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "3-2": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "FCA Warning List に英語名なし。",
+      "urls": [
+        {
+          "url": "https://www.fca.org.uk/scamsmart/warning-list",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "3-3": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "SEC PAUSE・CFTC RED List に英語名なし。",
+      "urls": [
+        {
+          "url": "https://www.sec.gov/enforce/pause-program-entities",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "3-4": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "ASIC investor alert list に英語名なし。",
+      "urls": [
+        {
+          "url": "https://moneysmart.gov.au/check-asic-lists",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "previousNameChecked": {
+        "合同会社ネクスト架空トレード": true
+      }
+    },
+    "4-1": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "法人番号公表サイトに「合同会社ミライ架空キャピタル」あり。住所も名乗りと同じ。",
+      "urls": [
+        {
+          "url": "https://www.houjin-bangou.nta.go.jp/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "4-2": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "変更履歴：2025年6月に「合同会社ネクスト架空トレード」から名前を変更、2026年2月に住所を変更。1年のうちに名前と住所が変わっている。",
+      "urls": [
+        {
+          "url": "https://www.houjin-bangou.nta.go.jp/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "4-3": {
+      "verdict": "na",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "naReason": "有料のため未確認（見ないと決めた）"
+    },
+    "4-4": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "前の名前「合同会社ネクスト架空トレード」が、金融庁の無登録業者への警告の一覧に2025年3月の日付で載っている。前の名前で同じ商売（AI自動売買の出資募集）をしていた。",
+      "urls": [
+        {
+          "url": "https://www.fsa.go.jp/ordinary/chuui/mutouroku.html",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "5-1": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "「架空太郎 出金できない」で、前の会社名（ネクスト架空トレード）と同じ港区の住所が出てくる被害の書き込みが複数（2025年）。会社名と地名の2つが一致するので同じ人物とみなす。",
+      "urls": [
+        {
+          "url": "https://news.google.com/search?q=%22%E6%9E%B6%E7%A9%BA%E5%A4%AA%E9%83%8E%22%20%E5%87%BA%E9%87%91%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84&hl=ja&gl=JP&ceid=JP:ja",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00",
+      "identityMatches": [
+        "company",
+        "place"
+      ]
+    },
+    "5-2": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "前の名前の会社の代表者が同じ人物かは、登記簿を見ていないので確かめられなかった。",
+      "urls": [
+        {
+          "url": "https://www.houjin-bangou.nta.go.jp/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "5-3": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "紹介者のSNS表示名「yuki_fx_life」で、2025年に別のFX自動売買の案件を紹介している投稿が見つかった（同じ人が次々と別の案件を紹介している）。",
+      "urls": [
+        {
+          "url": "https://www.google.com/search?q=%22yuki_fx_life%22+%E6%8A%95%E8%B3%87",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "5-4": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "ai",
+      "memo": "「被害者の会」「弁護団」の検索で、この案件名・会社名のものは見つからなかった（見つからない＝安全ではない）。",
+      "urls": [
+        {
+          "url": "https://www.google.com/search?q=%22%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%89AI%E3%83%97%E3%83%A9%E3%83%B3%22+%E8%A2%AB%E5%AE%B3%E8%80%85%E3%81%AE%E4%BC%9A",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "6-1": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "ドメイン mirai-fictional-capital.example の作成日は2026年3月。1年未満。",
+      "urls": [
+        {
+          "url": "https://lookup.icann.org/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "6-2": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "2024年のサイトは別の暗号資産の案件（「ネクストコイン」の出資募集）のページだった。",
+      "urls": [
+        {
+          "url": "https://web.archive.org/web/*/https://mirai-fictional-capital.example/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "6-3": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "住所のビルはレンタルオフィス（住所貸しのプランあり）。",
+      "urls": [
+        {
+          "url": "https://www.google.com/maps/search/%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E6%9E%B6%E7%A9%BA1-2-3",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "6-4": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "サイトに代表者名・登録番号の記載なし。問い合わせ先はLINEのみ。",
+      "urls": [
+        {
+          "url": "https://mirai-fictional-capital.example/",
+          "viewedAt": "2026-10-15T10:00:00+09:00"
+        }
+      ],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "7-1": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "振込先が代表者の個人名義。会社名（合同会社ミライ架空キャピタル）と違う。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "振込先：架空銀行 新橋支店 普通 1234567 カクウ タロウ"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "7-2": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "払い方は国内の銀行振込。暗号資産だけ、海外の口座ではない（名義の問題は7-1で赤）。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "7-3": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "「月利8%」「元本保証」「損失は補填」と、利益と損をしないことを約束している。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "月利8%、元本保証です。",
+        "損失はこちらで補填するので、損はしません。"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "7-4": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "お金を払った人が人を誘うと報酬が出る仕組み。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "友達を紹介すると、その人の入金額の10%がもらえます。"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "7-5": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "出金のために手数料を先に払えと言っている。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "出金のときは手数料として利益の20%を先に振り込んでもらう決まりです。"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "8-1": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "成績はLINEで送られた画像だけ。第三者が確かめられる形（Myfxbookの認証など）はない。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "8-2": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "成績の画像は直近3か月分だけ。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "8-3": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "最大の下落は書かれていない。聞いても「AIが守るので大丈夫」と答えるだけ。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "8-4": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "成績を出した口座の運用額は不明。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "9-1": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "締め切りと残り枠で急がせている。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "今回の枠は今週の金曜日で締め切りです。残り3枠。"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "9-2": {
+      "verdict": "red",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "家族に秘密にさせようとしている。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "家族に話すと反対されるから、決めてから話したほうがいいですよ。"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "9-3": {
+      "verdict": "blue",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "有名人・有名企業の名前は出ていない（「元大手証券」という言い方だけで、社名は出ていない）。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "9-4": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "「AIが自動で」「誰でも」「ほったらかし」と言っている。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "AIが自動で金を売買します。",
+        "知識がなくても誰でもできます。ほったらかしでOK。"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "9-5": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "質問すると態度が変わった。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [
+        "質問が多いですね…疑うなら、やらなくても大丈夫ですよ。"
+      ],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    },
+    "9-6": {
+      "verdict": "yellow",
+      "provisional": false,
+      "checkedBy": "self",
+      "memo": "InstagramのDMで知り合っただけで、会ったことのない人からの話。",
+      "urls": [],
+      "screenshots": [],
+      "quotes": [],
+      "updatedAt": "2026-10-15T12:00:00+09:00"
+    }
+  },
+  "previousNames": [
+    "合同会社ネクスト架空トレード"
+  ],
+  "aiResearchRaw": "（デモ：AIの下調べの全文はここに保存されます）",
+  "reviewRaw": "（デモ：見落としチェックの指摘は、分類2について「前の名前でも警告の一覧を確かめたか」の1件でした）",
+  "review": {
+    "status": "done",
+    "flaggedCategories": [
+      2
+    ],
+    "findings": [
+      {
+        "id": "2-1",
+        "type": "not_found_as_safe",
+        "comment": "前の名前（合同会社ネクスト架空トレード）でも無登録警告の一覧を確かめたか。現在の名前で載っていないだけでは青にできない。"
+      }
+    ],
+    "doneAt": "2026-10-15T12:00:00+09:00"
+  },
+  "stoppedEarly": false,
+  "snapshots": [],
+  "attachments": []
+}
