@@ -74,6 +74,8 @@ describe('過去案件との照合', () => {
     expect(searchCases([c], 'yuki').map((r) => r.c.id)).toEqual(['demo-gold-ai-plan']);
     expect(searchCases([c], '架空太郎')).toHaveLength(1);
     expect(searchCases([c], '0300000000')).toHaveLength(1);
+    expect(searchCases([c], 'ゴールド yuki')).toHaveLength(1);
+    expect(searchCases([c], 'ゴールド 無関係')).toHaveLength(0);
     expect(searchCases([c], 'ぜんぜん別の名前')).toHaveLength(0);
     expect(searchCases([c], '')).toHaveLength(0);
   });

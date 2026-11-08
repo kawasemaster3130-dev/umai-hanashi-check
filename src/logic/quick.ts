@@ -5,8 +5,8 @@ import { newCase } from '../types';
 import type { KeywordsConfig } from '../data/config';
 import { linkByKey } from '../data/config';
 import { computeAutoHints } from './hints';
-import { caseTitle, findCrossMatches, searchCases, type CrossMatch } from './crossref';
-import { digitsOnly, isBlank } from './util';
+import { caseTitle, findCrossMatches, searchCases, splitQuery, type CrossMatch } from './crossref';
+import { digitsOnly } from './util';
 
 export interface QuickConfig {
   labels: Record<string, string>;
@@ -30,7 +30,8 @@ export interface QuickAction {
   key: string;
   label: string;
   url: string;
-  copy?: string;
+  copy?: string; // 開くときに自動でコピーする言葉
+  copies?: string[]; // コピーのボタンを出す言葉（複数）
   how: string;
 }
 
@@ -51,12 +52,18 @@ export function looksLikePhone(q: string): boolean {
 export function draftCase(input: QuickInput, now: string): Case {
   const c = newCase('quick-draft', now);
   c.rawMessages = input.text.trim();
-  const q = input.query.trim();
-  if (q) {
-    if (looksLikePhone(q)) c.card.companyPhone = q;
-    else c.card.companyNames = [q];
-  }
+  const { names, phones } = splitTerms(input.query);
+  if (phones.length) c.card.companyPhone = phones[0];
+  if (names.length) c.card.companyNames = names;
   return c;
+}
+
+/** 入力した言葉を、名前（会社名・案件名・人名）と電話番号に分ける */
+export function splitTerms(query: string): { names: string[]; phones: string[] } {
+  const names: string[] = [];
+  const phones: string[] = [];
+  for (const t of splitQuery(query)) (looksLikePhone(t) ? phones : names).push(t);
+  return { names, phones };
 }
 
 export function quickCheck(input: QuickInput, cases: Case[], keywords: KeywordsConfig, items: ChecklistItem[], now: string): QuickResult {
@@ -67,6 +74,7 @@ export function quickCheck(input: QuickInput, cases: Case[], keywords: KeywordsC
     .sort((a, b) => (a.suggest === b.suggest ? 0 : a.suggest === 'red' ? -1 : 1));
   const level = hits.some((h) => h.suggest === 'red') ? 'red' : hits.length ? 'yellow' : 'none';
   const q = input.query.trim();
+  const { names, phones } = splitTerms(q);
   const past: CrossMatch[] = findCrossMatches(draft, cases);
   if (q) {
     for (const { c, hits: hs } of searchCases(cases, q)) {
@@ -76,17 +84,22 @@ export function quickCheck(input: QuickInput, cases: Case[], keywords: KeywordsC
       }
     }
   }
-  const phone = looksLikePhone(q) ? q : undefined;
-  const name = !isBlank(q) && !phone ? q : undefined;
+  const name = names.length ? names.map((n) => `"${n}"`).join(' ') : undefined;
   const actions: QuickAction[] = [];
   for (const a of quickConfig.actions) {
-    if (a.key === 'phone' && !phone) continue;
-    if (a.key !== 'phone' && !name) continue;
+    if (a.key === 'phone') {
+      for (const ph of phones) {
+        const url = `https://www.google.com/search?q=${encodeURIComponent((a.search ?? '"{{phone}}"').replace('{{phone}}', ph))}`;
+        actions.push({ key: `phone:${ph}`, label: `${a.label}（${ph}）`, url, how: a.how });
+      }
+      continue;
+    }
+    if (!name) continue;
     let url = '';
     if (a.linkKey) url = linkByKey(a.linkKey)?.url ?? '';
-    if (a.search) url = `https://www.google.com/search?q=${encodeURIComponent(a.search.replace('{{name}}', name ?? '').replace('{{phone}}', phone ?? ''))}`;
+    if (a.search) url = `https://www.google.com/search?q=${encodeURIComponent(a.search.replace('{{name}}', name))}`;
     if (!url) continue;
-    actions.push({ key: a.key, label: a.label, url, copy: a.copy === 'name' ? name : undefined, how: a.how });
+    actions.push({ key: a.key, label: a.label, url, copy: a.copy === 'name' ? names[0] : undefined, copies: a.copy === 'name' ? names : undefined, how: a.how });
   }
   return { level, hits, past, actions, draft };
 }

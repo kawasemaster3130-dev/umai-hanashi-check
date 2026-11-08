@@ -71,8 +71,8 @@ export function QuickScreen() {
         <p className="mt-1 text-sm text-ink-3">読み取りはこの端末の中で行います。外には送りません。初回だけ部品の読み込みに少し時間がかかります。</p>
       </div>
       <label className="block">
-        <span className="label text-base">会社の名前・人の名前・電話番号（どれか1つ）</span>
-        <input className="input text-lg" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="例：◯◯キャピタル／03-0000-0000" onKeyDown={(e) => e.key === 'Enter' && run()} />
+        <span className="label text-base">会社の名前・話の名前・人の名前・電話番号（いくつでも。空白で区切る）</span>
+        <input className="input text-lg" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="例：◯◯キャピタル ゴールドプラン 03-0000-0000" onKeyDown={(e) => e.key === 'Enter' && run()} />
       </label>
       <button type="button" className="k-btn k-btn-ink" onClick={run} disabled={!text.trim() && !query.trim()}>
         チェックする
@@ -139,7 +139,9 @@ export function QuickScreen() {
                     </a>
                     <p className="k-sub mt-1 flex flex-wrap items-center gap-2">
                       {a.how}
-                      {a.copy && <CopyButton text={a.copy} label={`「${a.copy}」をコピー`} />}
+                      {(a.copies ?? []).map((n) => (
+                        <CopyButton key={n} text={n} label={`「${n}」をコピー`} />
+                      ))}
                     </p>
                   </div>
                 ))}
@@ -165,6 +167,9 @@ export function QuickScreen() {
           <Link to="/kantan" className="k-btn">
             文章がなくても10問で確かめる
           </Link>
+          <button type="button" className="k-btn" onClick={() => void startCase('card')}>
+            くわしく調べる（教材の41項目）
+          </button>
           <Link to="/paid" className="k-btn k-btn-shu">
             もう払ってしまった
           </Link>

@@ -43,7 +43,7 @@ export function Home() {
 
       <section className="card space-y-2">
         <label className="block">
-          <span className="label">記録の中をさがす（会社名・名前・口座名義・URL・電話）</span>
+          <span className="label">記録の中をさがす（話の名前・会社名・人の名前・口座名義・URL・電話。空白で区切って複数可）</span>
           <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="例：会社名、口座名義、ドメイン" />
         </label>
         {results && (

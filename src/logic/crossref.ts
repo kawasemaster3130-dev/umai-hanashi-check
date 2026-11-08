@@ -59,15 +59,32 @@ export function findCrossMatches(target: Case, others: Case[]): CrossMatch[] {
   return out;
 }
 
-/** 会社名・人名・SNS表示名・口座名義・URL・電話・暗号資産アドレスで、全案件を横断検索 */
+/** 検索の言葉を分ける（空白・読点・カンマ区切り。複数ならすべてを含む記録だけ） */
+export function splitQuery(query: string): string[] {
+  return query
+    .split(/[\s\u3000,、]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+/** 案件名・会社名・人名・SNS表示名・口座名義・URL・電話・暗号資産アドレスで、全案件を横断検索。複数の言葉はすべて含むもの */
 export function searchCases(cases: Case[], query: string): { c: Case; hits: CaseKey[] }[] {
-  const q = normalizeKey(query);
-  const qd = digitsOnly(query);
-  if (!q && !qd) return [];
+  const tokens = splitQuery(query).map((t) => ({ q: normalizeKey(t), qd: digitsOnly(t), raw: t }));
+  if (!tokens.length) return [];
   const out: { c: Case; hits: CaseKey[] }[] = [];
   for (const c of cases) {
-    const hits = extractKeys(c).filter((k) => (q && k.norm.includes(q)) || (qd.length >= 4 && k.field === '電話番号' && k.norm.includes(qd)));
-    if (hits.length) out.push({ c, hits });
+    const keys = extractKeys(c);
+    const hits: CaseKey[] = [];
+    let all = true;
+    for (const t of tokens) {
+      const h = keys.filter((k) => (t.q && k.norm.includes(t.q)) || (t.qd.length >= 4 && k.field === '電話番号' && k.norm.includes(t.qd)));
+      if (!h.length) {
+        all = false;
+        break;
+      }
+      for (const k of h) if (!hits.includes(k)) hits.push(k);
+    }
+    if (all && hits.length) out.push({ c, hits });
   }
   return out;
 }

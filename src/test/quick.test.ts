@@ -31,7 +31,7 @@ describe('ぱっとチェック', () => {
     expect(looksLikePhone('03-0000-0000')).toBe(true);
     expect(looksLikePhone('ミライ')).toBe(false);
     const r = quickCheck({ text: '', query: '03-0000-0000' }, [demo as unknown as Case], keywords, items, NOW);
-    expect(r.actions.map((a) => a.key)).toEqual(['phone']);
+    expect(r.actions.map((a) => a.key)).toEqual(['phone:03-0000-0000']);
     expect(r.past.some((m) => m.field === '電話番号')).toBe(true);
   });
 });
@@ -40,5 +40,21 @@ describe('OCRの文章のそろえ方', () => {
   it('行の途中の改行と日本語の間の空白を詰める', () => {
     const t = normalizeOcrText('月利8%、元本保証で\nす。\n\n家族に話すと反対される\nから。\n振込先: 架空 銀行');
     expect(t).toBe('月利8%、元本保証です。\n家族に話すと反対されるから。\n振込先: 架空銀行');
+  });
+});
+
+describe('複数の言葉・案件名', () => {
+  it('案件名でも記録が見つかる', () => {
+    const r = quickCheck({ text: '', query: 'ゴールドAI' }, [demo as unknown as Case], keywords, items, NOW);
+    expect(r.past.some((m) => m.otherField === '案件名')).toBe(true);
+  });
+  it('空白で区切った複数の言葉は、すべて含む記録だけ。電話番号は番号検索に', () => {
+    const ok = quickCheck({ text: '', query: 'ゴールド ミライ 03-0000-0000' }, [demo as unknown as Case], keywords, items, NOW);
+    expect(ok.past.length).toBeGreaterThan(0);
+    expect(ok.actions.map((a) => a.key)).toEqual(['fsa', 'warn', 'web', 'phone:03-0000-0000']);
+    expect(ok.actions[0].copies).toEqual(['ゴールド', 'ミライ']);
+    expect(ok.draft.card.companyNames).toEqual(['ゴールド', 'ミライ']);
+    const ng = quickCheck({ text: '', query: 'ゴールド 別の会社' }, [demo as unknown as Case], keywords, items, NOW);
+    expect(ng.past).toEqual([]);
   });
 });
