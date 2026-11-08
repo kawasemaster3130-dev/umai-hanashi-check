@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { Overall, Verdict, VerdictCounts } from '../types';
-import { VERDICT_ICON, VERDICT_LABEL } from '../types';
+import { VERDICT_ICON, VERDICT_LABEL, VERDICT_SIMPLE } from '../types';
 
 export const VERDICT_CLASS: Record<Verdict, string> = {
   red: 'bg-v-red-bg text-v-red border-v-red',
@@ -29,8 +29,8 @@ export function VerdictBadge({ v, provisional, size = 'md' }: { v: Verdict; prov
     <span className={`chip ${VERDICT_CLASS[v]} ${cls}`} aria-label={`判定 ${VERDICT_LABEL[v]}`}>
       <Seal v={v} size={size === 'lg' ? 'md' : 'sm'} />
       <span aria-hidden="true">{VERDICT_ICON[v]}</span>
-      {VERDICT_LABEL[v]}
-      {provisional && v !== 'unchecked' ? <span className="font-normal">（仮）</span> : null}
+      {VERDICT_SIMPLE[v]}
+      {provisional && v !== 'unchecked' ? <span className="font-normal">（AIの仮）</span> : null}
     </span>
   );
 }
@@ -60,7 +60,7 @@ export function CountsBar({ counts, compact }: { counts: VerdictCounts; compact?
         <tr>
           {order.map((v) => (
             <th key={v} className={`${TEXT_CLASS[v]} !py-0.5`}>
-              <span aria-hidden="true">{VERDICT_ICON[v]}</span> {VERDICT_LABEL[v]}
+              <span aria-hidden="true">{VERDICT_ICON[v]}</span> {VERDICT_SIMPLE[v]}
             </th>
           ))}
         </tr>

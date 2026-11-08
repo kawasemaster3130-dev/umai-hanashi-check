@@ -184,3 +184,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .k-list-title { font-family: var(--font-mincho); font-weight: 800; border-bottom: 1px solid var(--color-rule); margin-bottom: 0.4rem; }
 .k-list li { padding: 0.3rem 0 0.3rem 1.4em; text-indent: -1.4em; font-size: 1.15rem; }
 .k-list li::before { content: "▌ "; color: var(--color-shu); }
+
+.k-hit { display: flex !important; align-items: flex-start; gap: 0.5rem; padding-left: 0 !important; text-indent: 0 !important; }
+.k-hit::before { content: none !important; }
+.k-hit .seal { margin-top: 0.15rem; }

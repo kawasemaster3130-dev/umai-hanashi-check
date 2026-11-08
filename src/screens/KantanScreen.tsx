@@ -92,6 +92,16 @@ function Question() {
       </div>
       <h1 className="k-q">{q.text}</h1>
       {q.sub && <p className="k-sub">{q.sub}</p>}
+      {(c.items[q.itemId]?.autoHints?.length ?? 0) > 0 && (
+        <div className="k-list">
+          <div className="k-list-title">言われたことの中に、こんな言葉がありました</div>
+          <ul>
+            {c.items[q.itemId]!.autoHints!.slice(0, 3).map((h, i) => (
+              <li key={i}>「{h.quote}」</li>
+            ))}
+          </ul>
+        </div>
+      )}
       {q.type === 'registry' && (
         <a className="k-btn k-btn-ink" href={FSA} target="_blank" rel="noopener noreferrer">
           金融庁のページを開く

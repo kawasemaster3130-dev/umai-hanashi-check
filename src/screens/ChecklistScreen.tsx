@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCaseCtx } from '../app/CaseContext';
 import { StepBar } from '../components/Layout';
@@ -6,7 +6,7 @@ import { CATEGORIES, itemsByCategory } from '../data/checklist';
 import { guideById, linksForGuide } from '../data/config';
 import { canStopEarly, getResult } from '../logic/verdict';
 import { buildSearchLines, googleSearchUrl } from '../logic/search';
-import { Collapsible, CopyButton, CountsBar, ExternalLink, VerdictBadge } from '../components/ui';
+import { Collapsible, CopyButton, CountsBar, ExternalLink, Seal, VerdictBadge } from '../components/ui';
 import { ItemEditor } from '../components/ItemEditor';
 import { LinkList } from '../components/LinkList';
 
@@ -24,6 +24,20 @@ export function ChecklistScreen() {
   const [highlight, setHighlight] = useState<string | null>(null);
   const searchLines = useMemo(() => buildSearchLines(c), [c]);
   const cardOnly = ctx.rules.cardOnlyCategories.includes(cat);
+  const prevRed = useRef(counts.red);
+  const [stopPanel, setStopPanel] = useState(false);
+  useEffect(() => {
+    if (prevRed.current === 0 && counts.red >= 1 && !c.stoppedEarly) setStopPanel(true);
+    prevRed.current = counts.red;
+  }, [counts.red, c.stoppedEarly]);
+  const stopNow = () => {
+    update((d) => {
+      d.stoppedEarly = true;
+      if (d.review.status === 'pending') d.review = { status: 'skipped', skipReason: '赤が出たので、ここで打ち切った', flaggedCategories: [], findings: [] };
+    });
+    setStopPanel(false);
+    navigate(`/case/${c.id}/sheet`);
+  };
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -56,6 +70,23 @@ export function ChecklistScreen() {
 
   return (
     <div className="space-y-4">
+      {stopPanel && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-3" role="dialog" aria-modal="true" aria-labelledby="stop-title">
+          <div className="k-result k-result-red w-full max-w-md gap-4">
+            <Seal v="red" size="xl" />
+            <h2 id="stop-title" className="k-q">
+              やめる理由が見つかりました
+            </h2>
+            <p className="k-sub">赤が1つあれば、答えは「払わない」です。ここで終わってかまいません。残りは調べなくても結果を出せます。</p>
+            <button type="button" className="k-btn k-btn-ink w-full" onClick={stopNow}>
+              ここで終わる（結果を見る）
+            </button>
+            <button type="button" className="k-btn w-full" onClick={() => setStopPanel(false)}>
+              続けて調べる
+            </button>
+          </div>
+        </div>
+      )}
       <StepBar />
       <div className="card space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -88,7 +119,7 @@ export function ChecklistScreen() {
           </div>
         )}
         <div className="border border-ink bg-paper-3 p-3">
-          <div className="mincho mb-1 font-bold">自分で必ず開く4項目（AIの答えは当てにしない）</div>
+          <div className="mincho mb-1 font-bold">自分の目で見る4つ（AIの答えは当てにしない）</div>
           <div className="flex flex-wrap gap-2">
             {selfItems.map((it) => {
               const r = getResult(c.items, it.id);
@@ -100,7 +131,7 @@ export function ChecklistScreen() {
               );
             })}
           </div>
-          <div className="mt-1 text-xs text-ink-2">金融庁の一覧（PDF）はパソコンで見ることを勧めます。会社名をコピー → 開く → Ctrl+F。</div>
+          <div className="mt-1 text-xs text-ink-2">金融庁の一覧はパソコンのほうが見やすいです。会社名をコピー → 開く → 検索。</div>
         </div>
       </div>
 
@@ -134,9 +165,9 @@ export function ChecklistScreen() {
           )}
         </div>
         {guide && <p className="text-sm text-ink-2">{guide.intro}</p>}
-        {cardOnly && <div className="note">この分類は検索しなくても、手元のやり取りと案件カードだけで判定できます。何も見つからず迷ったら、分類7と9を先に見ます。</div>}
-        {cat >= 1 && cat <= 3 && <div className="note">「載っていない」は安全の意味ではありません。似た名前・英語名・略称・前の名前でも探します。</div>}
-        {c.review.flaggedCategories.includes(cat) && <div className="note">見落としチェックで、この分類に指摘がありました。指摘された項目だけでなく、この分類の全項目を見直して「見直し済み」にしてください。</div>}
+        {cardOnly && <div className="note">ここは調べものは要りません。言われたことを思い出して答えるだけです。迷ったら7と9を先に。</div>}
+        {cat >= 1 && cat <= 3 && <div className="note">「載っていない」は安全の意味ではありません。似た名前・英語名・前の名前でも探します。</div>}
+        {c.review.flaggedCategories.includes(cat) && <div className="note">もう一人（別のAI）から、この分類に指摘がありました。ここの全部を見直して「見直し済み」にしてください。</div>}
         {guide && linksForGuide(guide.id).length > 0 && (
           <Collapsible title={`調べる場所（${guide.title.replace(/　.*/, '')}）`} defaultOpen={cat <= 3}>
             <LinkList links={linksForGuide(guide.id)} c={c} />
@@ -178,7 +209,7 @@ export function ChecklistScreen() {
           </button>
         ) : (
           <Link to={`/case/${c.id}/review`} className="btn-primary">
-            ステップ6 見落としチェックへ →
+            ステップ6 もう一人に見てもらう →
           </Link>
         )}
       </div>

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { ChecklistItem, IdentityKey, ItemResult, Verdict } from '../types';
-import { IDENTITY_LABEL, VERDICT_ICON, VERDICT_LABEL, VERDICT_MEANING } from '../types';
+import { IDENTITY_LABEL, VERDICT_ICON, VERDICT_MEANING, VERDICT_SIMPLE } from '../types';
 import { useCaseCtx } from '../app/CaseContext';
-import { applyVerdict, getResult, isInRecheckRange, validateVerdictChange, type Problem } from '../logic/verdict';
+import { applyVerdict, evidenceCount, getResult, isInRecheckRange, validateVerdictChange, type Problem } from '../logic/verdict';
 import { categoryOf } from '../data/checklist';
 import { formatDateTime, isBlank, nowIso } from '../logic/util';
 import { ExternalLink, ListInput, SEAL_CHAR, VerdictBadge, VERDICT_CLASS } from './ui';
@@ -21,6 +21,8 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
   const [naReason, setNaReason] = useState(r.naReason ?? '');
   const [urlDraft, setUrlDraft] = useState('');
   const [picker, setPicker] = useState(false);
+  const hasRecord = evidenceCount(r) > 0 || !isBlank(r.memo) || !!r.checkedBy || (r.identityMatches?.length ?? 0) > 0;
+  const [open, setOpen] = useState<boolean>(hasRecord || item.selfRequired);
   const cat = categoryOf(item.cat);
   const flagged = c.review.flaggedCategories.includes(item.cat);
   const inRange = isInRecheckRange(ctx, item.id) && c.previousNames.length > 0;
@@ -54,6 +56,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
     const probs = validateVerdictChange(item, r, v, ctx, patch, c.items);
     if (probs.length) {
       setProblems(probs);
+      setOpen(true);
       return;
     }
     update((d) => {
@@ -91,10 +94,16 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
         <VerdictBadge v={r.verdict} provisional={r.provisional} size="lg" />
       </header>
 
-      <div className="grid gap-1 text-sm sm:grid-cols-2">
+      <div className="space-y-0.5 text-sm">
         <div>
-          <span className="font-semibold">調べる場所：</span>
-          {item.where}
+          <span className="font-semibold text-v-red">赤：</span>
+          {item.red ?? 'この項目では赤はない'}
+          <span className="mx-2 text-rule">｜</span>
+          <span className="font-semibold text-v-yellow">黄：</span>
+          {item.yellow ?? (item.red ? '調べられなかった' : '—')}
+        </div>
+        <div className="text-ink-3">
+          どこで見る：{item.where}
           {cat && (
             <>
               {' '}
@@ -103,28 +112,13 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
               </Link>
             </>
           )}
-        </div>
-        <div className="space-y-0.5">
-          <div>
-            <span className="font-semibold text-v-red">赤になるのは：</span>
-            {item.red ?? 'この項目では赤はない'}
-          </div>
-          <div>
-            <span className="font-semibold text-v-yellow">黄になるのは：</span>
-            {item.yellow ?? (item.red ? '調べられなかった、確かめ終わっていない' : '—')}
-          </div>
-          {item.naAllowed && item.naHint && (
-            <div>
-              <span className="font-semibold text-v-na">該当なしにできるのは：</span>
-              {item.naHint}
-            </div>
-          )}
+          {item.naAllowed && item.naHint ? `　関係ないとき：${item.naHint}` : ''}
         </div>
       </div>
 
       {r.autoHints && r.autoHints.length > 0 && (
         <div className="note space-y-1">
-          <div className="font-semibold">自動の気づき（候補です。判定ではありません。引用を確かめて自分で判定します）</div>
+          <div className="font-semibold">こんな言葉がありました（候補です。見て、自分で判定します）</div>
           <ul className="space-y-1">
             {r.autoHints.map((h, i) => (
               <li key={i} className="flex flex-wrap items-center gap-2">
@@ -133,7 +127,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
                 {h.note && <span className="text-xs text-ink-2">{h.note}</span>}
                 {!r.quotes.includes(h.quote) && (
                   <button type="button" className="btn-secondary btn-sm !min-h-7 !py-0 text-xs" onClick={() => setR({ quotes: [...r.quotes, h.quote] })}>
-                    引用に追加
+                    記録に入れる
                   </button>
                 )}
               </li>
@@ -171,7 +165,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
       )}
 
       <div>
-        <div className="label">判定{r.provisional && r.verdict !== 'unchecked' ? '（仮のままです。ボタンを押して自分の判定として確定します）' : ''}</div>
+        <div className="label">あなたの判定{r.provisional && r.verdict !== 'unchecked' ? '（AIの仮の答えです。ボタンを押して自分の判定にします）' : ''}</div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="判定を選ぶ">
           {VERDICT_ORDER.filter((v) => v !== 'na' || item.naAllowed).map((v) => {
             const active = r.verdict === v && !r.provisional;
@@ -187,14 +181,14 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
               >
                 <span className="seal seal-sm" aria-hidden="true">{SEAL_CHAR[v]}</span>
                 <span aria-hidden="true">{VERDICT_ICON[v]}</span>
-                {VERDICT_LABEL[v]}
+                {VERDICT_SIMPLE[v]}
               </button>
             );
           })}
         </div>
         {naMode && (
           <div className="mt-2 space-y-2 border border-v-na bg-v-na-bg p-3">
-            <div className="text-sm font-semibold">「該当なし」にする理由（必須）</div>
+            <div className="text-sm font-semibold">「関係ない」理由（必ず書く）</div>
             <input className="input" value={naReason} onChange={(e) => setNaReason(e.target.value)} placeholder={item.naHint ?? '当てはまらない理由'} />
             <div className="flex flex-wrap gap-2">
               {item.naHint && (
@@ -203,7 +197,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
                 </button>
               )}
               <button type="button" className="btn-primary btn-sm" onClick={() => trySet('na', { naReason })}>
-                該当なしにする
+                関係ないにする
               </button>
               <button type="button" className="btn-secondary btn-sm" onClick={() => setNaMode(false)}>
                 やめる
@@ -213,7 +207,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
         )}
         {r.verdict === 'na' && r.naReason && (
           <div className="mt-1 text-sm text-ink-2">
-            該当なしの理由：{r.naReason}{' '}
+            関係ない理由：{r.naReason}{' '}
             <button type="button" className="link" onClick={() => setNaMode(true)}>
               直す
             </button>
@@ -228,6 +222,20 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
         )}
       </div>
 
+      {!open ? (
+        <button type="button" className="btn-secondary btn-sm" onClick={() => setOpen(true)}>
+          記録を残す（メモ・見たページ・スクショ・言われた言葉）{hasRecord ? '　✓あり' : ''}
+        </button>
+      ) : (
+        <div className="space-y-3 border-t border-dashed border-rule pt-3">
+          <div className="flex items-center justify-between">
+            <span className="mincho font-bold">記録</span>
+            {!item.selfRequired && (
+              <button type="button" className="link text-sm" onClick={() => setOpen(false)}>
+                たたむ
+              </button>
+            )}
+          </div>
       {item.identityCheck && (
         <div className="border border-rule bg-paper-3/50 p-3">
           <div className="label">同じ人物と言える手がかり（赤にするには2つ以上）</div>
@@ -273,26 +281,26 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <div className="label">確認した人</div>
+          <div className="label">だれが見た</div>
           <div className="flex gap-3">
             {(['self', 'ai'] as const).map((k) => (
               <label key={k} className="inline-flex items-center gap-1">
                 <input type="radio" className="size-5" name={`by-${item.id}`} checked={r.checkedBy === k} onChange={() => setR({ checkedBy: k })} />
-                {k === 'self' ? '自分' : 'AI下調べ'}
+                {k === 'self' ? '自分' : 'AI'}
               </label>
             ))}
           </div>
-          {item.selfRequired && r.checkedBy !== 'self' && <div className="mt-1 text-xs text-v-red">この項目は「自分」でないと判定の1枚を確定できません。</div>}
+          {item.selfRequired && r.checkedBy !== 'self' && <div className="mt-1 text-xs text-v-red">ここは自分の目で見た、にならないと結果を確定できません。</div>}
         </div>
         <label className="block">
-          <span className="label">結果メモ（何を見て、何が分かったか）</span>
+          <span className="label">メモ（何を見て、何が分かったか）</span>
           <textarea className="textarea min-h-20" value={r.memo ?? ''} onChange={(e) => setR({ memo: e.target.value })} placeholder="例：一括検索と一覧PDFで会社名を検索。載っていなかった。" />
         </label>
       </div>
 
       <div>
         <div className="label">
-          見たURL（{r.urls.length}）<span className="font-normal text-ink-3">　青でも入れることを強く勧めます</span>
+          見たページ（{r.urls.length}）<span className="font-normal text-ink-3">　青のときも残すと安心</span>
         </div>
         {r.urls.length > 0 && (
           <ul className="mb-2 space-y-1 text-sm">
@@ -329,12 +337,12 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
       </div>
 
       <div>
-        <div className="label">スクリーンショット（{r.screenshots.length}）</div>
+        <div className="label">スクショ（{r.screenshots.length}）</div>
         <Screenshots caseId={c.id} itemId={item.id} ids={r.screenshots} onChange={(ids) => setR({ screenshots: ids })} />
       </div>
 
       <div>
-        <div className="label">やり取りからの引用（{r.quotes.length}）</div>
+        <div className="label">言われた言葉（{r.quotes.length}）</div>
         {r.quotes.length > 0 && (
           <ul className="mb-2 space-y-1 text-sm">
             {r.quotes.map((q, i) => (
@@ -348,7 +356,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
           </ul>
         )}
         <button type="button" className="btn-secondary btn-sm" onClick={() => setPicker(true)}>
-          ＋ やり取りから引用
+          ＋ 言われた言葉を貼る
         </button>
         {picker && <QuotePicker text={c.rawMessages} onPick={(q) => setR({ quotes: r.quotes.includes(q) ? r.quotes : [...r.quotes, q] })} onClose={() => setPicker(false)} />}
       </div>
@@ -358,6 +366,8 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
           <input type="checkbox" className="size-5" checked={!!r.reviewed} onChange={(e) => setR({ reviewed: e.target.checked })} />
           見直し済み（分類{item.cat}に見落としの指摘があったので、この項目も見直しました）
         </label>
+      )}
+        </div>
       )}
       {!isBlank(r.updatedAt) && <div className="text-right text-xs text-ink-3">更新：{formatDateTime(r.updatedAt)}</div>}
     </article>

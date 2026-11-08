@@ -184,6 +184,15 @@ export const VERDICT_LABEL: Record<Verdict, string> = {
   unchecked: '未調査',
 };
 
+/** 画面のボタン・札で使う易しい言い方（判定票・CSVは VERDICT_LABEL のまま） */
+export const VERDICT_SIMPLE: Record<Verdict, string> = {
+  red: '赤',
+  yellow: '黄',
+  blue: '青',
+  na: '関係ない',
+  unchecked: 'まだ',
+};
+
 export const VERDICT_ICON: Record<Verdict, string> = {
   red: '✕',
   yellow: '△',

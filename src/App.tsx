@@ -15,6 +15,7 @@ import { PaidScreen, PaidStandalone } from './screens/PaidScreen';
 import { GuidesScreen } from './screens/GuidesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { KantanScreen, KantanStart } from './screens/KantanScreen';
+import { QuickScreen } from './screens/QuickScreen';
 
 function CaseLayout() {
   const { id = '' } = useParams();
@@ -46,7 +47,8 @@ export default function App() {
       <Shell>
         {settings && !settings.consentedAt && <ConsentModal />}
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<QuickScreen />} />
+          <Route path="/cases" element={<Home />} />
           <Route path="/paid" element={<PaidStandalone />} />
           <Route path="/kantan" element={<KantanStart />} />
           <Route path="/kantan/:id" element={<KantanScreen />} />

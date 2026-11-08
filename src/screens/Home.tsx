@@ -23,9 +23,9 @@ export function Home() {
 
   return (
     <div className="space-y-4">
-      <PageTitle title="うまい話チェック" sub="人から勧められた投資の話を、お金を払う前に41項目で点検し、赤・黄・青の判定の1枚と証拠を残します。" />
-      <Link to="/kantan" className="k-btn k-btn-ink">
-        かんたん版　質問に答えるだけ（2分）
+      <PageTitle title="保存した記録" sub="調べた話の一覧です。新しく調べるときは、上の題字から「この話、だいじょうぶ？」へ。" />
+      <Link to="/" className="k-btn k-btn-ink">
+        新しい話をぱっとチェック
       </Link>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-primary text-lg" onClick={newCase}>
@@ -36,14 +36,14 @@ export function Home() {
         </Link>
       </div>
       <div className="grid gap-2 text-sm sm:grid-cols-3">
-        <div className="note-info">本当にもうかる話が、自分のところに来ることはありません。</div>
-        <div className="note-info">一番大事なのは、売っている人と会社の過去。あわせて国の登録を確かめます。</div>
-        <div className="note-info">AIは間違えます。登録の有無は必ず自分で一覧を開きます。</div>
+        <div className="note-info">本当にもうかる話は、自分のところには来ません。</div>
+        <div className="note-info">一番大事なのは、売っている人と会社の過去。それと国の登録。</div>
+        <div className="note-info">AIは間違えます。登録は自分の目で見ます。</div>
       </div>
 
       <section className="card space-y-2">
         <label className="block">
-          <span className="label">過去の案件を横断検索（会社名・人名・SNS表示名・口座名義・URL・電話・暗号資産アドレス）</span>
+          <span className="label">記録の中をさがす（会社名・名前・口座名義・URL・電話）</span>
           <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="例：会社名、口座名義、ドメイン" />
         </label>
         {results && (
@@ -62,12 +62,12 @@ export function Home() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="h2">案件の一覧</h2>
+        <h2 className="h2 dai">一覧</h2>
         {!cases ? (
           <Spinner />
         ) : cases.length === 0 ? (
           <div className="card space-y-3">
-            <p>まだ案件がありません。「新しく調べる」から始めるか、教材の通しの例（デモ）を読み込んで画面の流れを確かめられます。</p>
+            <p>まだ記録がありません。教材の例（デモ）を読み込むと、画面の流れを見られます。</p>
             <button
               type="button"
               className="btn-secondary"

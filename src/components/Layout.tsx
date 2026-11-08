@@ -17,8 +17,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </NavLink>
           <nav className="mincho flex shrink-0 items-center gap-0 text-[0.8rem] sm:gap-0.5 sm:text-sm" aria-label="メニュー">
             {[
-              ['/', 'ホーム'],
-              ['/kantan', 'かんたん'],
+              ['/cases', '記録'],
               ['/guides', '手引き'],
               ['/settings', '設定'],
             ].map(([to, label]) => (
@@ -36,12 +35,12 @@ export function Shell({ children }: { children: ReactNode }) {
 }
 
 export const STEPS: { key: string; label: string; short: string; path: string }[] = [
-  { key: 'card', label: 'ステップ1 案件カード', short: '1 案件カード', path: 'card' },
-  { key: 'research', label: 'ステップ2 AI下調べ', short: '2 AI下調べ', path: 'research' },
-  { key: 'check', label: 'ステップ3〜5 チェック表', short: '3-5 チェック表', path: 'check' },
-  { key: 'review', label: 'ステップ6 見落としチェック', short: '6 見落とし', path: 'review' },
-  { key: 'sheet', label: 'ステップ7 判定の1枚', short: '7 判定の1枚', path: 'sheet' },
-  { key: 'next', label: 'ステップ8 このあとどうするか', short: '8 このあと', path: 'next' },
+  { key: 'card', label: 'ステップ1 話を入れる', short: '1 話を入れる', path: 'card' },
+  { key: 'research', label: 'ステップ2 AIに下調べ', short: '2 AIに下調べ', path: 'research' },
+  { key: 'check', label: 'ステップ3〜5 チェック', short: '3-5 チェック', path: 'check' },
+  { key: 'review', label: 'ステップ6 もう一人に見てもらう', short: '6 もう一人に', path: 'review' },
+  { key: 'sheet', label: 'ステップ7 結果の1枚', short: '7 結果の1枚', path: 'sheet' },
+  { key: 'next', label: 'ステップ8 このあと', short: '8 このあと', path: 'next' },
 ];
 
 export function stepStatus(v: ReturnType<typeof useCaseCtx>): Record<string, 'done' | 'partial' | 'todo'> {
