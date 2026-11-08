@@ -24,9 +24,12 @@ export function Home() {
   return (
     <div className="space-y-4">
       <PageTitle title="うまい話チェック" sub="人から勧められた投資の話を、お金を払う前に41項目で点検し、赤・黄・青の判定の1枚と証拠を残します。" />
+      <Link to="/kantan" className="k-btn k-btn-ink">
+        かんたん版　質問に答えるだけ（2分）
+      </Link>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-primary text-lg" onClick={newCase}>
-          ＋ 新しく調べる
+          ＋ くわしく調べる（41項目）
         </button>
         <Link to="/paid" className="btn-danger">
           すでに払ってしまった人へ

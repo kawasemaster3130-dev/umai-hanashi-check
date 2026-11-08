@@ -52,7 +52,10 @@ export interface Case {
   alreadyPaid?: PaidRecord;
   snapshots: SheetSnapshot[]; // 確定した判定の1枚の版
   attachments: Attachment[]; // 案件カードに添付した画像（証拠として保存）
+  kantan?: { answers: Record<string, KantanAnswer>; finishedAt?: string }; // かんたん版の答え
 }
+
+export type KantanAnswer = 'yes' | 'no' | 'unknown' | 'listed' | 'not_listed' | 'not_yet';
 
 export interface ReviewState {
   status: 'pending' | 'done' | 'skipped';

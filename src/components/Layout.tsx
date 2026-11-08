@@ -11,17 +11,18 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-screen">
       <header className="daiji sticky top-0 z-20">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
-          <NavLink to="/" className="mincho whitespace-nowrap text-base font-extrabold tracking-[0.12em] sm:text-lg sm:tracking-[0.2em]">
+          <NavLink to="/" className="mincho whitespace-nowrap text-[0.95rem] font-extrabold tracking-[0.08em] sm:text-lg sm:tracking-[0.2em]">
             <span className="mr-2 hidden border border-paper-2 px-1 align-middle text-[0.65rem] tracking-widest sm:inline-block">点検票</span>
             うまい話チェック
           </NavLink>
-          <nav className="mincho flex shrink-0 items-center gap-0.5 text-sm" aria-label="メニュー">
+          <nav className="mincho flex shrink-0 items-center gap-0 text-[0.8rem] sm:gap-0.5 sm:text-sm" aria-label="メニュー">
             {[
               ['/', 'ホーム'],
+              ['/kantan', 'かんたん'],
               ['/guides', '手引き'],
               ['/settings', '設定'],
             ].map(([to, label]) => (
-              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `whitespace-nowrap px-1.5 py-1 sm:px-2 ${isActive ? 'bg-paper-2 text-ink font-bold' : 'underline-offset-4 hover:underline'}`}>
+              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `whitespace-nowrap px-1 py-1 sm:px-2 ${isActive ? 'bg-paper-2 text-ink font-bold' : 'underline-offset-4 hover:underline'}`}>
                 {label}
               </NavLink>
             ))}

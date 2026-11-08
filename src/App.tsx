@@ -14,6 +14,7 @@ import { NextScreen } from './screens/NextScreen';
 import { PaidScreen, PaidStandalone } from './screens/PaidScreen';
 import { GuidesScreen } from './screens/GuidesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { KantanScreen, KantanStart } from './screens/KantanScreen';
 
 function CaseLayout() {
   const { id = '' } = useParams();
@@ -47,6 +48,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/paid" element={<PaidStandalone />} />
+          <Route path="/kantan" element={<KantanStart />} />
+          <Route path="/kantan/:id" element={<KantanScreen />} />
           <Route path="/guides" element={<GuidesScreen />} />
           <Route path="/guides/:guideId" element={<GuidesScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
