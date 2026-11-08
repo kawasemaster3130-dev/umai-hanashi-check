@@ -18,7 +18,7 @@ export function QuotePicker({ text, onPick, onClose }: { text: string; onPick: (
   };
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 p-3 sm:items-center" role="dialog" aria-modal="true">
-      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-3 overflow-hidden rounded-2xl bg-white p-4 shadow-xl">
+      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col gap-3 overflow-hidden border border-ink bg-paper-2 p-4 outline outline-1 outline-offset-4 outline-ink">
         <div className="flex items-center justify-between">
           <h3 className="h3">やり取りから引用する</h3>
           <button type="button" className="btn-secondary btn-sm" onClick={onClose}>
@@ -27,7 +27,7 @@ export function QuotePicker({ text, onPick, onClose }: { text: string; onPick: (
         </div>
         {text ? (
           <>
-            <p className="text-sm text-gray-700">引用したい部分を選んで「選んだ部分を引用」を押します。言い換えず、そのまま残します。</p>
+            <p className="text-sm text-ink-2">引用したい部分を選んで「選んだ部分を引用」を押します。言い換えず、そのまま残します。</p>
             <textarea ref={ref} readOnly className="textarea min-h-48 flex-1 text-sm" value={text} />
             {msg && <div className="note">{msg}</div>}
             <button type="button" className="btn-primary" onClick={pickSelection}>

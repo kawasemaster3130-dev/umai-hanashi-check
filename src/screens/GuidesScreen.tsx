@@ -51,7 +51,7 @@ export function GuidesScreen() {
               </li>
             ))}
           </ul>
-          <div className="text-xs text-gray-600">{used.length ? `${used[0].id}〜${used[used.length - 1].id}` : ''}</div>
+          <div className="text-xs text-ink-3">{used.length ? `${used[0].id}〜${used[used.length - 1].id}` : ''}</div>
         </section>
       </div>
     );
@@ -69,8 +69,8 @@ export function GuidesScreen() {
               <Link to={`/guides/${x.id}`} className="h3 link no-underline hover:underline">
                 {x.title}
               </Link>
-              <p className="mt-1 line-clamp-3 text-sm text-gray-700">{x.intro}</p>
-              <div className="mt-1 text-xs text-gray-600">使う項目：{used.length ? `${used[0].id}〜${used[used.length - 1].id}` : '—'}</div>
+              <p className="mt-1 line-clamp-3 text-sm text-ink-2">{x.intro}</p>
+              <div className="mt-1 text-xs text-ink-3">使う項目：{used.length ? `${used[0].id}〜${used[used.length - 1].id}` : '—'}</div>
             </li>
           );
         })}

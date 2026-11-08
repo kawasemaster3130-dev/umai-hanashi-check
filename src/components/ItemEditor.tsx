@@ -6,7 +6,7 @@ import { useCaseCtx } from '../app/CaseContext';
 import { applyVerdict, getResult, isInRecheckRange, validateVerdictChange, type Problem } from '../logic/verdict';
 import { categoryOf } from '../data/checklist';
 import { formatDateTime, isBlank, nowIso } from '../logic/util';
-import { ExternalLink, ListInput, VerdictBadge, VERDICT_CLASS } from './ui';
+import { ExternalLink, ListInput, SEAL_CHAR, VerdictBadge, VERDICT_CLASS } from './ui';
 import { Screenshots } from './Screenshots';
 import { QuotePicker } from './QuotePicker';
 
@@ -71,21 +71,21 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
     setUrlDraft('');
   };
 
-  const border = r.verdict === 'unchecked' ? 'border-gray-300' : VERDICT_CLASS[r.verdict].split(' ').find((x) => x.startsWith('border-')) ?? 'border-gray-300';
+  const border = r.verdict === 'unchecked' ? 'border-ink' : VERDICT_CLASS[r.verdict].split(' ').find((x) => x.startsWith('border-')) ?? 'border-ink';
 
   return (
-    <article id={`item-${item.id}`} className={`card scroll-mt-28 space-y-3 border-2 ${border} ${highlight ? 'ring-2 ring-navy' : ''}`} aria-labelledby={`item-${item.id}-title`}>
+    <article id={`item-${item.id}`} className={`card scroll-mt-28 space-y-3 !border-2 ${border} ${highlight ? 'outline-shu' : ''}`} aria-labelledby={`item-${item.id}-title`}>
       <header className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 id={`item-${item.id}-title`} className="text-lg font-bold leading-snug">
-            <span className="mr-2 rounded bg-gray-800 px-1.5 py-0.5 text-sm text-white">{item.id}</span>
+            <span className="fuda mr-2 align-middle">{item.id}</span>
             {item.question}
           </h3>
           <div className="mt-1 flex flex-wrap gap-1 text-xs">
-            {item.selfRequired && <span className="chip border-navy bg-navy text-white">必ず自分で開く</span>}
-            {item.identityCheck && <span className="chip border-gray-500 bg-gray-100 text-gray-800">同一人物の手がかり2つ以上</span>}
-            {flagged && <span className="chip border-amber-600 bg-amber-50 text-amber-900">見落とし指摘あり：見直し</span>}
-            {item.status && <span className="chip border-gray-500 bg-gray-100 text-gray-800">追加項目</span>}
+            {item.selfRequired && <span className="chip bg-ink text-paper-2">必ず自分で開く</span>}
+            {item.identityCheck && <span className="chip bg-paper-3 text-ink-2">同一人物の手がかり2つ以上</span>}
+            {flagged && <span className="chip bg-ocher-bg text-ocher">見落とし指摘あり：見直し</span>}
+            {item.status && <span className="chip bg-paper-3 text-ink-2">追加項目</span>}
           </div>
         </div>
         <VerdictBadge v={r.verdict} provisional={r.provisional} size="lg" />
@@ -130,7 +130,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
               <li key={i} className="flex flex-wrap items-center gap-2">
                 <VerdictBadge v={h.suggest} size="sm" />
                 <span className="break-all">「{h.quote}」</span>
-                {h.note && <span className="text-xs text-gray-700">{h.note}</span>}
+                {h.note && <span className="text-xs text-ink-2">{h.note}</span>}
                 {!r.quotes.includes(h.quote) && (
                   <button type="button" className="btn-secondary btn-sm !min-h-7 !py-0 text-xs" onClick={() => setR({ quotes: [...r.quotes, h.quote] })}>
                     引用に追加
@@ -179,11 +179,13 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
               <button
                 key={v}
                 type="button"
-                className={`btn ${VERDICT_CLASS[v]} ${active ? 'ring-2 ring-offset-1 ring-gray-800 font-bold' : 'opacity-80 hover:opacity-100'}`}
+                className={`btn ${VERDICT_CLASS[v]} ${active ? '!shadow-none translate-x-[2px] translate-y-[2px] ring-2 ring-ink' : 'opacity-85 hover:opacity-100'}`}
+                style={{ borderColor: 'currentColor', boxShadow: active ? 'none' : '2px 2px 0 0 currentColor' }}
                 aria-pressed={active}
                 title={VERDICT_MEANING[v]}
                 onClick={() => trySet(v)}
               >
+                <span className="seal seal-sm" aria-hidden="true">{SEAL_CHAR[v]}</span>
                 <span aria-hidden="true">{VERDICT_ICON[v]}</span>
                 {VERDICT_LABEL[v]}
               </button>
@@ -191,7 +193,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
           })}
         </div>
         {naMode && (
-          <div className="mt-2 space-y-2 rounded-lg border border-v-na bg-v-na-bg p-3">
+          <div className="mt-2 space-y-2 border border-v-na bg-v-na-bg p-3">
             <div className="text-sm font-semibold">「該当なし」にする理由（必須）</div>
             <input className="input" value={naReason} onChange={(e) => setNaReason(e.target.value)} placeholder={item.naHint ?? '当てはまらない理由'} />
             <div className="flex flex-wrap gap-2">
@@ -210,7 +212,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
           </div>
         )}
         {r.verdict === 'na' && r.naReason && (
-          <div className="mt-1 text-sm text-gray-700">
+          <div className="mt-1 text-sm text-ink-2">
             該当なしの理由：{r.naReason}{' '}
             <button type="button" className="link" onClick={() => setNaMode(true)}>
               直す
@@ -227,7 +229,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
       </div>
 
       {item.identityCheck && (
-        <div className="rounded-lg border border-gray-300 p-3">
+        <div className="border border-rule bg-paper-3/50 p-3">
           <div className="label">同じ人物と言える手がかり（赤にするには2つ以上）</div>
           <div className="flex flex-wrap gap-3">
             {IDENTITY_KEYS.map((k) => (
@@ -245,19 +247,19 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
               </label>
             ))}
           </div>
-          <div className="mt-1 text-xs text-gray-600">名前だけの一致で赤にしません。1つ以下なら黄（同じ人と確かめられなかった）。</div>
+          <div className="mt-1 text-xs text-ink-3">名前だけの一致で赤にしません。1つ以下なら黄（同じ人と確かめられなかった）。</div>
         </div>
       )}
 
       {isTrigger && (
-        <div className="rounded-lg border border-gray-300 p-3">
+        <div className="border border-rule bg-paper-3/50 p-3">
           <div className="label">見つかった前の名前（入力すると、2-1〜3-4に「前の名前でも確認」の欄が増えます）</div>
           <ListInput values={c.previousNames} onChange={(v) => update((d) => void (d.previousNames = v))} placeholder="前の会社名" />
         </div>
       )}
 
       {inRange && (
-        <div className="rounded-lg border border-amber-400 bg-amber-50 p-3">
+        <div className="border border-ocher bg-ocher-bg p-3">
           <div className="label">前の名前でも確認（4-4を青にするには全部にチェック）</div>
           <div className="flex flex-wrap gap-3">
             {c.previousNames.map((n) => (
@@ -290,15 +292,15 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
 
       <div>
         <div className="label">
-          見たURL（{r.urls.length}）<span className="font-normal text-gray-600">　青でも入れることを強く勧めます</span>
+          見たURL（{r.urls.length}）<span className="font-normal text-ink-3">　青でも入れることを強く勧めます</span>
         </div>
         {r.urls.length > 0 && (
           <ul className="mb-2 space-y-1 text-sm">
             {r.urls.map((u, i) => (
               <li key={`${u.url}-${i}`} className="flex flex-wrap items-center gap-2">
                 <ExternalLink href={u.url}>{u.url}</ExternalLink>
-                <span className="text-xs text-gray-600">{formatDateTime(u.viewedAt)}</span>
-                <button type="button" className="text-xs text-gray-600 underline" onClick={() => setR({ urls: r.urls.filter((_, j) => j !== i) })}>
+                <span className="text-xs text-ink-3">{formatDateTime(u.viewedAt)}</span>
+                <button type="button" className="text-xs text-ink-3 underline" onClick={() => setR({ urls: r.urls.filter((_, j) => j !== i) })}>
                   外す
                 </button>
               </li>
@@ -336,9 +338,9 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
         {r.quotes.length > 0 && (
           <ul className="mb-2 space-y-1 text-sm">
             {r.quotes.map((q, i) => (
-              <li key={`${q}-${i}`} className="flex items-start gap-2 rounded bg-gray-50 px-2 py-1">
+              <li key={`${q}-${i}`} className="flex items-start gap-2 bg-paper-3 px-2 py-1">
                 <span className="flex-1 break-words">「{q}」</span>
-                <button type="button" className="text-xs text-gray-600 underline" onClick={() => setR({ quotes: r.quotes.filter((_, j) => j !== i) })}>
+                <button type="button" className="text-xs text-ink-3 underline" onClick={() => setR({ quotes: r.quotes.filter((_, j) => j !== i) })}>
                   外す
                 </button>
               </li>
@@ -352,12 +354,12 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
       </div>
 
       {flagged && (
-        <label className="flex items-center gap-2 rounded-lg border border-amber-500 bg-amber-50 p-3 font-semibold">
+        <label className="flex items-center gap-2 border border-ocher bg-ocher-bg p-3 font-semibold">
           <input type="checkbox" className="size-5" checked={!!r.reviewed} onChange={(e) => setR({ reviewed: e.target.checked })} />
           見直し済み（分類{item.cat}に見落としの指摘があったので、この項目も見直しました）
         </label>
       )}
-      {!isBlank(r.updatedAt) && <div className="text-right text-xs text-gray-500">更新：{formatDateTime(r.updatedAt)}</div>}
+      {!isBlank(r.updatedAt) && <div className="text-right text-xs text-ink-3">更新：{formatDateTime(r.updatedAt)}</div>}
     </article>
   );
 }

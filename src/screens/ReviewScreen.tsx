@@ -33,13 +33,13 @@ export function ReviewScreen() {
     <div className="space-y-4">
       <StepBar />
       <h2 className="h2">ステップ6　別のAIで見落としを探す</h2>
-      <p className="text-sm text-gray-700">別のAI、または同じAIの新しい会話で使ってください（同じ会話だと、自分の答えをかばいます）。下調べの結果といまのチェック表を渡し、辛口の確認役として4点だけ指摘させます。</p>
+      <p className="text-sm text-ink-2">別のAI、または同じAIの新しい会話で使ってください（同じ会話だと、自分の答えをかばいます）。下調べの結果といまのチェック表を渡し、辛口の確認役として4点だけ指摘させます。</p>
 
       <div className="card flex flex-wrap items-center gap-2">
         <span className="font-semibold">いまの状態：</span>
-        {rv.status === 'pending' && <span className="chip border-gray-500 bg-gray-100">未実施</span>}
-        {rv.status === 'done' && <span className="chip border-green-700 bg-green-50 text-green-900">実施済み（指摘 {rv.findings.length} 件）</span>}
-        {rv.status === 'skipped' && <span className="chip border-amber-600 bg-amber-50 text-amber-900">省略（{rv.skipReason || '理由未記入'}）</span>}
+        {rv.status === 'pending' && <span className="chip border-rule bg-paper-3">未実施</span>}
+        {rv.status === 'done' && <span className="chip border-shu bg-paper-2 text-shu">実施済み（指摘 {rv.findings.length} 件）</span>}
+        {rv.status === 'skipped' && <span className="chip border-ocher bg-ocher-bg text-ocher">省略（{rv.skipReason || '理由未記入'}）</span>}
         {rv.status !== 'pending' && (
           <button type="button" className="btn-secondary btn-sm" onClick={() => update((d) => void (d.review = { status: 'pending', flaggedCategories: [], findings: [] }))}>
             やり直す
@@ -50,10 +50,10 @@ export function ReviewScreen() {
       <Section title="1. 依頼文をコピー">
         <div className="flex flex-wrap items-center gap-2">
           <CopyButton text={prompt} label="依頼文をコピー" className="btn-primary" />
-          <span className="text-xs text-gray-600">チェック表（{items.length}行）と下調べの全文が入ります。伏せる言葉は置き換え済みです。</span>
+          <span className="text-xs text-ink-3">チェック表（{items.length}行）と下調べの全文が入ります。伏せる言葉は置き換え済みです。</span>
         </div>
         <details>
-          <summary className="cursor-pointer text-sm text-gray-700">依頼文を見る</summary>
+          <summary className="cursor-pointer text-sm text-ink-2">依頼文を見る</summary>
           <textarea readOnly className="textarea mt-2 min-h-60 text-xs" value={prompt} />
         </details>
       </Section>
@@ -109,12 +109,12 @@ export function ReviewScreen() {
             {rv.findings.map((f, i) => {
               const it = items.find((x) => x.id === f.id);
               return (
-                <li key={i} className="rounded-lg border border-amber-400 bg-amber-50 p-3">
+                <li key={i} className="rounded-lg border border-ocher bg-ocher-bg p-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link className="link font-bold" to={`/case/${c.id}/check?cat=${it?.cat ?? 1}#item-${f.id}`}>
                       {f.id} {it?.question}
                     </Link>
-                    <span className="chip border-amber-700 bg-white text-xs text-amber-900">{TYPE_LABEL[f.type] ?? f.type}</span>
+                    <span className="chip border-ocher bg-paper-2 text-xs text-ocher">{TYPE_LABEL[f.type] ?? f.type}</span>
                   </div>
                   <div className="mt-1 text-sm">{f.comment}</div>
                 </li>
@@ -128,7 +128,7 @@ export function ReviewScreen() {
                 <Link className="link" to={`/case/${c.id}/check?cat=${p.cat}`}>
                   分類{p.cat} {CATEGORIES.find((k) => k.no === p.cat)?.title}
                 </Link>
-                <span className={p.done === p.total ? 'text-green-800' : 'text-amber-900'}>
+                <span className={p.done === p.total ? 'text-shu' : 'text-ocher'}>
                   見直し済み {p.done}/{p.total}
                 </span>
               </div>

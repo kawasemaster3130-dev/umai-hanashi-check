@@ -118,65 +118,84 @@ export function buildSheetData(c: Case, ctx: VerdictContext, opts: SheetOptions 
 }
 
 const COLORS: Record<Overall, { fg: string; bg: string }> = {
-  red: { fg: '#b3261e', bg: '#fbe9e7' },
-  yellow: { fg: '#8a5a00', bg: '#fff3cd' },
-  blue: { fg: '#0b5cad', bg: '#e3effc' },
+  red: { fg: '#b2321c', bg: '#f6e3dc' },
+  yellow: { fg: '#8a6100', bg: '#f3e6bd' },
+  blue: { fg: '#1f4b78', bg: '#dde7f1' },
 };
 
 export const SHEET_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;700;800&family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #fff; color: #1c1c1a; }
-  body { font-family: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif; font-size: 13px; line-height: 1.45; }
-  .sheet { width: 100%; max-width: 186mm; margin: 0 auto; padding: 10px 12px; }
-  h1 { font-size: 18px; margin: 0 0 2px; }
-  .meta { color: #444; font-size: 12px; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
-  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; margin-bottom: 8px; }
-  .counts { display: flex; gap: 6px; flex-wrap: wrap; }
-  .count { border: 1px solid #999; border-radius: 6px; padding: 4px 8px; min-width: 64px; text-align: center; }
-  .count b { display: block; font-size: 18px; }
-  .overall { flex: 1; min-width: 150px; border: 2px solid; border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 10px; }
-  .overall .big { font-size: 30px; font-weight: 800; line-height: 1; }
-  .overall .sub { font-size: 13px; font-weight: 700; }
-  h2 { font-size: 13.5px; margin: 8px 0 3px; padding-bottom: 2px; border-bottom: 1px solid #bbb; }
-  ol, ul { margin: 0; padding-left: 20px; }
-  li { margin: 1px 0; }
-  .id { font-weight: 700; margin-right: 4px; }
-  .q { color: #333; }
-  .muted { color: #666; }
-  .conclusion { border: 1.5px solid #333; border-radius: 6px; padding: 7px 10px; font-size: 14.5px; font-weight: 700; margin-top: 6px; }
-  .checks span { display: inline-block; margin-right: 12px; }
-  .notes { font-size: 12px; }
-  .disclaimer { font-size: 10.5px; color: #444; border-top: 1px solid #bbb; margin-top: 8px; padding-top: 5px; }
-  .caution { font-size: 10.5px; color: #444; }
-  .paid { border: 1px dashed #777; border-radius: 6px; padding: 5px 8px; font-size: 12px; }
-  .tag { display: inline-block; font-size: 11px; border: 1px solid #777; border-radius: 4px; padding: 0 5px; margin-left: 6px; color: #333; }
+  html, body { margin: 0; padding: 0; background: #fff; color: #23211f; }
+  body { font-family: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", Meiryo, sans-serif; font-size: 12.5px; line-height: 1.45; }
+  .mincho, h1, h2 { font-family: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; }
+  .mono { font-family: "IBM Plex Mono", "Courier New", monospace; }
+  .sheet { width: 100%; max-width: 186mm; margin: 0 auto; padding: 8px 10px; border: 1px solid #23211f; outline: 1px solid #23211f; outline-offset: 3px; background: #fff; }
+  .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; border-bottom: 3px double #23211f; padding-bottom: 6px; }
+  h1 { font-size: 19px; margin: 0; letter-spacing: 0.12em; font-weight: 800; }
+  h1 small { font-size: 10px; letter-spacing: 0.3em; display: block; color: #4a4641; font-weight: 400; margin-bottom: 2px; }
+  .tag { display: inline-block; font-size: 10px; border: 1px solid #23211f; padding: 1px 6px; letter-spacing: 0.1em; font-family: inherit; }
+  table.meta { border-collapse: collapse; width: 100%; margin: 6px 0; }
+  table.meta th, table.meta td { border: 1px solid #b9aa93; padding: 3px 6px; font-size: 11.5px; text-align: left; }
+  table.meta th { background: #ebe4d4; width: 5.5em; font-weight: 700; white-space: nowrap; }
+  .row { display: flex; gap: 10px; align-items: stretch; margin: 6px 0; }
+  table.counts { border-collapse: collapse; flex: 1; }
+  table.counts th, table.counts td { border: 1px solid #23211f; text-align: center; padding: 3px 4px; }
+  table.counts th { font-size: 11px; background: #ebe4d4; letter-spacing: 0.1em; }
+  table.counts td { font-size: 22px; font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  table.counts td small { display: block; font-size: 9.5px; font-family: inherit; font-weight: 400; color: #4a4641; }
+  .overall { width: 150px; border: 2px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px; }
+  .overall .lbl { font-size: 9.5px; letter-spacing: 0.4em; }
+  .seal { width: 58px; height: 58px; border: 3px solid currentColor; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; transform: rotate(-7deg); margin: 2px 0; }
+  .overall .word { font-size: 15px; font-weight: 800; letter-spacing: 0.1em; }
+  .overall .sub { font-size: 9.5px; text-align: center; }
+  h2 { font-size: 12.5px; margin: 7px 0 2px; padding: 1px 0 1px 8px; border-left: 4px solid #b2321c; letter-spacing: 0.08em; }
+  ol, ul { margin: 0; padding-left: 0; list-style: none; }
+  li { margin: 0; padding: 2px 0 2px 2.6em; text-indent: -2.6em; border-bottom: 1px dotted #b9aa93; }
+  .id { display: inline-block; width: 2.4em; text-indent: 0; font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .q { font-weight: 700; }
+  .muted { color: #7a746b; }
+  .conclusion { border: 2px solid #23211f; padding: 7px 10px; font-size: 14px; font-weight: 800; margin-top: 8px; letter-spacing: 0.04em; }
+  .checks span { display: inline-block; margin-right: 14px; font-family: "IBM Plex Mono", monospace; }
+  .notes li { padding-left: 1em; text-indent: -1em; }
+  .notes li::before { content: "※ "; }
+  .disclaimer { font-size: 10px; color: #4a4641; border-top: 1px solid #23211f; margin-top: 8px; padding-top: 4px; }
+  .caution { font-size: 10px; color: #4a4641; }
+  .paid { border: 1px dashed #23211f; padding: 4px 8px; font-size: 11.5px; }
   .break { word-break: break-all; }
   @page { size: A4 portrait; margin: 10mm 12mm; }
-  @media print { body { font-size: 12px; } .sheet { max-width: none; padding: 0; } .no-print { display: none !important; } }
+  @media print { body { font-size: 11.5px; } .sheet { max-width: none; } .no-print { display: none !important; } }
 `;
 
 export function renderSheetBody(d: SheetData): string {
   const col = COLORS[d.overall];
   const e = escapeHtml;
   const li = (rows: SheetRow[]) => rows.map((r) => `<li><span class="id">${e(r.id)}</span><span class="q">${e(r.question)}</span>：${e(r.text)}</li>`).join('');
+  const seal: Record<Overall, string> = { red: '止', yellow: '待', blue: '可' };
   return `
 <div class="sheet">
-  <h1>うまい話チェック　判定の1枚${d.version ? `<span class="tag">第${d.version}版</span>` : '<span class="tag">未確定（下書き）</span>'}</h1>
-  <div class="meta">
-    <span>案件の名前：<b>${e(d.caseName)}</b></span>
-    <span>調べた日：${e(d.dateLabel)}</span>
-    ${d.investigator ? `<span>調べた人：${e(d.investigator)}</span>` : ''}
-    ${d.confirmedAt ? `<span>確定：${e(formatDate(d.confirmedAt))}</span>` : ''}
+  <div class="head">
+    <h1><small>投資の話の点検　うまい話チェック</small>判定票</h1>
+    <span class="tag">${d.version ? `第${d.version}版` : '未確定（下書き）'}</span>
   </div>
+  <table class="meta"><tbody>
+    <tr><th>件名</th><td><b>${e(d.caseName)}</b></td><th>調べた日</th><td>${e(d.dateLabel)}</td></tr>
+    <tr><th>調べた人</th><td>${d.investigator ? e(d.investigator) : '—'}</td><th>確定</th><td>${d.confirmedAt ? e(formatDate(d.confirmedAt)) : '—'}</td></tr>
+  </tbody></table>
   <div class="row">
-    <div class="counts">
-      <div class="count" style="color:${COLORS.red.fg};background:${COLORS.red.bg}">赤<b>${d.counts.red}</b></div>
-      <div class="count" style="color:${COLORS.yellow.fg};background:${COLORS.yellow.bg}">黄<b>${d.counts.yellow + d.counts.unchecked}</b><span class="muted">うち未調査 ${d.counts.unchecked}</span></div>
-      <div class="count" style="color:${COLORS.blue.fg};background:${COLORS.blue.bg}">青<b>${d.counts.blue + d.counts.na}</b><span class="muted">うち該当なし ${d.counts.na}</span></div>
-    </div>
-    <div class="overall" style="color:${col.fg};border-color:${col.fg};background:${col.bg}">
-      <div class="big">${VERDICT_ICON[d.overall]} ${VERDICT_LABEL[d.overall]}</div>
-      <div class="sub">${d.overall === 'red' ? 'やめる' : d.overall === 'yellow' ? '確かめるまで払わない' : '大きな問題は見つからなかった（保証ではない）'}</div>
+    <table class="counts"><tbody>
+      <tr><th style="color:${COLORS.red.fg}">✕ 赤</th><th style="color:${COLORS.yellow.fg}">△ 黄</th><th style="color:${COLORS.blue.fg}">○ 青</th></tr>
+      <tr>
+        <td style="color:${COLORS.red.fg}">${d.counts.red}<small>やめる理由</small></td>
+        <td style="color:${COLORS.yellow.fg}">${d.counts.yellow + d.counts.unchecked}<small>うち未調査 ${d.counts.unchecked}</small></td>
+        <td style="color:${COLORS.blue.fg}">${d.counts.blue + d.counts.na}<small>うち該当なし ${d.counts.na}</small></td>
+      </tr>
+    </tbody></table>
+    <div class="overall" style="color:${col.fg};background:${col.bg}">
+      <span class="lbl">総合判定</span>
+      <span class="seal mincho">${seal[d.overall]}</span>
+      <span class="word mincho">${VERDICT_ICON[d.overall]} ${VERDICT_LABEL[d.overall]}</span>
+      <span class="sub">${d.overall === 'red' ? 'やめる' : d.overall === 'yellow' ? '確かめるまで払わない' : '大きな問題は見つからなかった（保証ではない）'}</span>
     </div>
   </div>
   <h2>赤になった項目と理由${d.redMore ? `（上から${d.reds.length}つ。ほか${d.redMore}件）` : ''}</h2>
@@ -185,9 +204,9 @@ export function renderSheetBody(d: SheetData): string {
   ${d.yellows.length ? `<ul>${li(d.yellows)}</ul>` : '<div class="muted">なし</div>'}
   <h2>自分の手で確かめた項目</h2>
   <div class="checks">${d.selfChecked.map((s) => `<span>${s.done ? '☑' : '☐'} ${e(s.id)}</span>`).join('')}</div>
-  <div class="conclusion">${e(d.conclusion)}</div>
+  <div class="conclusion mincho">${e(d.conclusion)}</div>
   <h2>証拠の置き場所</h2>
-  <div class="break">${e(d.evidenceLocation)}</div>
+  <div class="break mono">${e(d.evidenceLocation)}</div>
   ${d.notes.length ? `<h2>注記</h2><ul class="notes">${d.notes.map((n) => `<li>${e(n)}</li>`).join('')}</ul>` : ''}
   ${d.paid ? `<h2>すでに払ってしまった場合の記録</h2><div class="paid">${d.paid.lines.map((l) => `<div>${e(l)}</div>`).join('')}</div>` : ''}
   <div class="disclaimer">${e(d.disclaimer)}</div>

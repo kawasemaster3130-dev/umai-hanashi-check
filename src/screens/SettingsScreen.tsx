@@ -43,10 +43,10 @@ export function SettingsScreen() {
       <PageTitle title="設定・このアプリについて" />
 
       <Section title="追加項目（原本にない提案。既定は無効）">
-        <p className="text-sm text-gray-700">有効にすると、チェック表に項目が増えます（原本の41項目と数が合わなくなります）。作者の確認後に有効化してください。</p>
+        <p className="text-sm text-ink-2">有効にすると、チェック表に項目が増えます（原本の41項目と数が合わなくなります）。作者の確認後に有効化してください。</p>
         <ul className="space-y-2">
           {OPTIONAL_ITEMS.map((it) => (
-            <li key={it.id} className="flex items-start gap-2 rounded-lg border border-gray-300 p-3">
+            <li key={it.id} className="flex items-start gap-2 rounded-lg border border-rule p-3">
               <input
                 type="checkbox"
                 className="mt-1 size-5"
@@ -57,7 +57,7 @@ export function SettingsScreen() {
                 <div className="font-semibold">
                   {it.id}（分類{it.cat}）{it.question}
                 </div>
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-ink-2">
                   {it.red ? `赤：${it.red}　` : ''}
                   {it.yellow ? `黄：${it.yellow}` : ''}
                 </div>
@@ -68,7 +68,7 @@ export function SettingsScreen() {
       </Section>
 
       <Section title="データの書き出し・読み込み・全削除">
-        <p className="text-sm text-gray-700">データはこの端末の中（ブラウザの保存領域）だけにあります。機種変更やブラウザのデータ消去に備えて、ZIPで書き出しておいてください。</p>
+        <p className="text-sm text-ink-2">データはこの端末の中（ブラウザの保存領域）だけにあります。機種変更やブラウザのデータ消去に備えて、ZIPで書き出しておいてください。</p>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -122,14 +122,14 @@ export function SettingsScreen() {
       </Section>
 
       <Section title="自動の気づきの言葉（表示のみ。編集は将来）">
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-ink-3">
           {keywords.note}（{keywords.asOf}時点）
         </p>
         <ul className="space-y-1 text-sm">
           {keywords.rules.map((r) => (
             <li key={r.itemId}>
               <span className="font-bold">{r.itemId}</span>（候補：{r.suggest === 'red' ? '赤' : '黄'}）：{(r.words ?? []).join('、')}
-              {r.patterns?.length ? <span className="text-gray-600">　＋パターン {r.patterns.length} 件</span> : null}
+              {r.patterns?.length ? <span className="text-ink-3">　＋パターン {r.patterns.length} 件</span> : null}
             </li>
           ))}
           <li>
@@ -167,7 +167,7 @@ export function SettingsScreen() {
           <dt className="font-semibold">代金</dt>
           <dd>{seller.seller.price || '（未記入）'}</dd>
         </dl>
-        <p className="text-xs text-gray-600">教材が教えるとおり、販売者の登録番号は金融庁の一覧で確かめられます（1-1・1-2）。</p>
+        <p className="text-xs text-ink-3">教材が教えるとおり、販売者の登録番号は金融庁の一覧で確かめられます（1-1・1-2）。</p>
         <div>
           <div className="font-semibold">免責</div>
           <ul className="list-disc pl-5 text-sm">
@@ -176,10 +176,10 @@ export function SettingsScreen() {
             ))}
           </ul>
         </div>
-        <div className="text-xs text-gray-600">
+        <div className="text-xs text-ink-3">
           URL・電話番号の基準日：調べる場所 {links.asOf}／相談先 {contacts.asOf}／手引き {guides.asOf}。役所のURLは変わることがあります。
         </div>
-        <div className="text-xs text-gray-600">同意日：{settings?.consentedAt ? new Date(settings.consentedAt).toLocaleString('ja-JP') : '—'}</div>
+        <div className="text-xs text-ink-3">同意日：{settings?.consentedAt ? new Date(settings.consentedAt).toLocaleString('ja-JP') : '—'}</div>
       </Section>
     </div>
   );

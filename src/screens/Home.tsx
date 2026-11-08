@@ -45,13 +45,13 @@ export function Home() {
         </label>
         {results && (
           <ul className="space-y-1 text-sm">
-            {results.length === 0 && <li className="text-gray-600">一致する案件はありません。</li>}
+            {results.length === 0 && <li className="text-ink-3">一致する案件はありません。</li>}
             {results.map(({ c, hits }) => (
               <li key={c.id}>
                 <Link className="link font-semibold" to={`/case/${c.id}/sheet`}>
                   {caseTitle(c)}
                 </Link>
-                <span className="ml-2 text-gray-700">{hits.map((h) => `${h.field}：${h.value}`).join('、')}</span>
+                <span className="ml-2 text-ink-2">{hits.map((h) => `${h.field}：${h.value}`).join('、')}</span>
               </li>
             ))}
           </ul>
@@ -90,7 +90,7 @@ export function Home() {
                     <Link className="h3 link no-underline hover:underline" to={`/case/${c.id}/${latest ? 'sheet' : decided > 0 ? 'check' : 'card'}`}>
                       {caseTitle(c)}
                     </Link>
-                    <div className="text-sm text-gray-700">
+                    <div className="text-sm text-ink-2">
                       調べた日：{formatDate(c.createdAt)}　進み具合：{decided}/{ctx.items.length} 項目{c.stoppedEarly ? '（赤で打ち切り）' : ''}
                       {latest ? `　確定済み（第${latest.version}版）` : '　未確定'}
                     </div>

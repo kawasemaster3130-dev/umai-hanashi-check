@@ -9,24 +9,25 @@ export function Shell({ children }: { children: ReactNode }) {
   const online = useOnline();
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-navy-dark bg-navy text-white shadow">
+      <header className="daiji sticky top-0 z-20">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
-          <NavLink to="/" className="text-lg font-extrabold tracking-wide">
+          <NavLink to="/" className="mincho whitespace-nowrap text-base font-extrabold tracking-[0.12em] sm:text-lg sm:tracking-[0.2em]">
+            <span className="mr-2 hidden border border-paper-2 px-1 align-middle text-[0.65rem] tracking-widest sm:inline-block">点検票</span>
             うまい話チェック
           </NavLink>
-          <nav className="flex items-center gap-1 text-sm" aria-label="メニュー">
+          <nav className="mincho flex shrink-0 items-center gap-0.5 text-sm" aria-label="メニュー">
             {[
               ['/', 'ホーム'],
               ['/guides', '手引き'],
               ['/settings', '設定'],
             ].map(([to, label]) => (
-              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `rounded-md px-2 py-1 ${isActive ? 'bg-white/20 font-bold' : 'hover:bg-white/10'}`}>
+              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `whitespace-nowrap px-1.5 py-1 sm:px-2 ${isActive ? 'bg-paper-2 text-ink font-bold' : 'underline-offset-4 hover:underline'}`}>
                 {label}
               </NavLink>
             ))}
           </nav>
         </div>
-        {!online && <div className="bg-amber-200 px-4 py-1 text-center text-xs text-amber-950">オフラインです。入力・保存・判定の1枚の表示はできます。外のサイトは開けません。</div>}
+        {!online && <div className="bg-ocher-bg px-4 py-1 text-center text-xs text-ink">オフラインです。入力・保存・判定の1枚の表示はできます。外のサイトは開けません。</div>}
       </header>
       <main className="mx-auto w-full max-w-5xl px-4 py-4 pb-24">{children}</main>
     </div>
@@ -61,30 +62,39 @@ export function StepBar() {
   const st = stepStatus(v);
   return (
     <div className="mb-4 space-y-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap items-end justify-between gap-2">
         <div className="min-w-0">
-          <div className="text-xs text-gray-600">案件</div>
+          <div className="text-[0.7rem] tracking-widest text-ink-3">件名</div>
           <h1 className="h2 truncate">{caseTitle(v.c)}</h1>
         </div>
         <div className="flex items-center gap-2">
           <OverallBadge o={v.overall} />
-          {v.saving ? <span className="text-xs text-gray-500">保存中…</span> : <span className="text-xs text-gray-500">自動保存</span>}
+          <span className="text-[0.7rem] text-ink-3">{v.saving ? '保存中…' : '自動保存'}</span>
         </div>
       </div>
-      <nav className="tabs -mx-4 flex gap-1 overflow-x-auto px-4 pb-1" aria-label="進み具合">
-        {STEPS.map((s) => (
-          <NavLink
-            key={s.key}
-            to={`/case/${id}/${s.path}`}
-            className={({ isActive }) =>
-              `shrink-0 rounded-full border px-3 py-1.5 text-sm font-semibold whitespace-nowrap ${isActive ? 'border-navy bg-navy text-white' : st[s.key] === 'done' ? 'border-green-700 bg-green-50 text-green-900' : st[s.key] === 'partial' ? 'border-amber-600 bg-amber-50 text-amber-900' : 'border-gray-400 bg-white text-gray-800'}`
-            }
-            title={s.label}
-          >
-            {st[s.key] === 'done' ? '✓ ' : ''}
-            {s.short}
-          </NavLink>
-        ))}
+      <nav className="tabs -mx-4 overflow-x-auto px-4 pb-1" aria-label="進み具合（検印欄）">
+        <div className="kenin min-w-max">
+          {STEPS.map((s) => (
+            <NavLink key={s.key} to={`/case/${id}/${s.path}`} className="kenin-cell" title={s.label} aria-current={undefined}>
+              {({ isActive }) => (
+                <>
+                  <span className="kenin-head" style={isActive ? { background: 'var(--color-ink)', color: 'var(--color-paper-2)' } : undefined}>
+                    {s.short}
+                  </span>
+                  <span className="kenin-body" style={isActive ? { boxShadow: 'inset 0 0 0 2px var(--color-shu)' } : undefined}>
+                    {st[s.key] === 'done' ? (
+                      <span className="seal seal-md text-shu">済</span>
+                    ) : st[s.key] === 'partial' ? (
+                      <span className="seal seal-md text-ocher">中</span>
+                    ) : (
+                      <span className="text-xs text-ink-3">　</span>
+                    )}
+                  </span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
       </nav>
     </div>
   );
@@ -92,9 +102,9 @@ export function StepBar() {
 
 export function PageTitle({ title, sub }: { title: ReactNode; sub?: ReactNode }) {
   return (
-    <div className="mb-3">
-      <h1 className="h1">{title}</h1>
-      {sub ? <p className="mt-1 text-sm text-gray-700">{sub}</p> : null}
+    <div className="mb-3 border-b-[3px] border-double border-ink pb-2">
+      <h1 className="h1 dai">{title}</h1>
+      {sub ? <p className="mt-1 text-sm text-ink-2">{sub}</p> : null}
     </div>
   );
 }

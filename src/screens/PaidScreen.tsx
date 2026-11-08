@@ -17,7 +17,7 @@ export function ContactsList() {
     <div className="space-y-2">
       <ul className="space-y-2">
         {contacts.contacts.map((k) => (
-          <li key={k.name} className="rounded-lg border border-gray-300 bg-white px-3 py-2">
+          <li key={k.name} className="rounded-lg border border-rule bg-paper-2 px-3 py-2">
             <div className="font-semibold">{k.name}</div>
             <div className="flex flex-wrap items-center gap-2">
               <a className="btn-secondary btn-sm" href={`tel:${k.tel.replace(/[^\d#+*]/g, '')}`}>
@@ -28,12 +28,12 @@ export function ContactsList() {
                   IP電話から {k.altTel}
                 </a>
               )}
-              {k.note && <span className="text-sm text-gray-700">{k.note}</span>}
+              {k.note && <span className="text-sm text-ink-2">{k.note}</span>}
             </div>
           </li>
         ))}
       </ul>
-      <div className="text-xs text-gray-600">
+      <div className="text-xs text-ink-3">
         番号は{contacts.asOf}時点。{contacts.note}
       </div>
     </div>

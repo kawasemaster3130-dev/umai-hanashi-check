@@ -13,7 +13,7 @@ import { findCrossMatches } from '../logic/crossref';
 import { deepClone, formatDate, isBlank } from '../logic/util';
 import type { CaseCard } from '../types';
 
-const BLANK = <span className="text-gray-500">（書かれていない）</span>;
+const BLANK = <span className="text-ink-3">（書かれていない）</span>;
 
 export function CaseCardScreen() {
   const { c, items, update } = useCaseCtx();
@@ -53,7 +53,7 @@ export function CaseCardScreen() {
     <div className="space-y-4">
       <StepBar />
       <h2 className="h2">ステップ1　案件カードを作る</h2>
-      <p className="text-sm text-gray-700">勧誘のやり取りを貼り、13項目に整理します。書かれていないことは「書かれていない」のままにします（空欄が多いこと自体が黄の材料です）。</p>
+      <p className="text-sm text-ink-2">勧誘のやり取りを貼り、13項目に整理します。書かれていないことは「書かれていない」のままにします（空欄が多いこと自体が黄の材料です）。</p>
 
       <Section title="1. 勧誘のやり取りを貼る（LINE・DM・メール・案内文）">
         <TextArea value={c.rawMessages} onChange={(v) => update((d) => void (d.rawMessages = v))} rows={10} placeholder="ここに、言われたことをそのまま貼ります。画像しかないときは下に添付し、要点を手で打ちます。" />
@@ -64,15 +64,15 @@ export function CaseCardScreen() {
       </Section>
 
       <Section title="2. 伏せる言葉（AIに渡したくない、自分の名前・電話・住所など）">
-        <p className="text-sm text-gray-700">依頼文を作るときに、登録した言葉を「【自分の名前】」などに置き換えます。相手の口座名義・暗号資産アドレスは調べるのに要るので伏せません。</p>
+        <p className="text-sm text-ink-2">依頼文を作るときに、登録した言葉を「【自分の名前】」などに置き換えます。相手の口座名義・暗号資産アドレスは調べるのに要るので伏せません。</p>
         {c.maskWords.length > 0 && (
           <ul className="flex flex-wrap gap-2">
             {c.maskWords.map((m, i) => (
-              <li key={i} className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-gray-50 px-2 py-1 text-sm">
+              <li key={i} className="inline-flex items-center gap-1 rounded-lg border border-rule bg-paper-3 px-2 py-1 text-sm">
                 <span>{m.word}</span>
-                <span className="text-gray-500">→</span>
+                <span className="text-ink-3">→</span>
                 <span>{m.label}</span>
-                <button type="button" className="ml-1 px-1 text-gray-600" aria-label="削除" onClick={() => update((d) => void d.maskWords.splice(i, 1))}>
+                <button type="button" className="ml-1 px-1 text-ink-3" aria-label="削除" onClick={() => update((d) => void d.maskWords.splice(i, 1))}>
                   ×
                 </button>
               </li>
@@ -102,7 +102,7 @@ export function CaseCardScreen() {
       </Section>
 
       <Section title="3. AIで整理する（任意）">
-        <p className="text-sm text-gray-700">依頼文をコピーして、お使いのAI（Claude・ChatGPT・Gemini など）に貼ります。返ってきた答え（JSONつき）を下に貼ると、カードに自動で入ります。手で入力してもかまいません。</p>
+        <p className="text-sm text-ink-2">依頼文をコピーして、お使いのAI（Claude・ChatGPT・Gemini など）に貼ります。返ってきた答え（JSONつき）を下に貼ると、カードに自動で入ります。手で入力してもかまいません。</p>
         {piWarn.length > 0 && (
           <ul className="note space-y-1">
             {piWarn.map((w) => (
@@ -114,7 +114,7 @@ export function CaseCardScreen() {
         <div className="flex flex-wrap gap-2">
           <CopyButton text={prompt} label="依頼文を作ってコピー" className="btn-primary" />
           <details className="w-full">
-            <summary className="cursor-pointer text-sm text-gray-700">依頼文を見る</summary>
+            <summary className="cursor-pointer text-sm text-ink-2">依頼文を見る</summary>
             <textarea readOnly className="textarea mt-2 min-h-40 text-xs" value={prompt} />
           </details>
         </div>
@@ -143,7 +143,7 @@ export function CaseCardScreen() {
         </div>
       </Section>
 
-      <Section title="4. 案件カード（13項目）" right={<span className="text-sm text-gray-700">空欄 {blanks} 件</span>}>
+      <Section title="4. 案件カード（13項目）" right={<span className="text-sm text-ink-2">空欄 {blanks} 件</span>}>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="1. 案件の名前">
             <TextInput value={k.caseName} onChange={(v) => setCard({ caseName: v })} placeholder="例：ゴールドAIプラン" />
@@ -214,12 +214,12 @@ export function CaseCardScreen() {
             <ListInput values={k.notablePhrases} onChange={(v) => setCard({ notablePhrases: v.slice(0, 3) })} placeholder="言われた言葉をそのまま" />
           </div>
         </div>
-        <div className="text-xs text-gray-600">空欄は判定の1枚・依頼文では {BLANK} と表示されます。</div>
+        <div className="text-xs text-ink-3">空欄は判定の1枚・依頼文では {BLANK} と表示されます。</div>
       </Section>
 
       <Section title="自動の気づき・過去の案件との照合">
         {hinted.length === 0 ? (
-          <p className="text-sm text-gray-700">やり取りと案件カードの文章から、まだ候補は出ていません（候補が出ない＝安全、ではありません）。</p>
+          <p className="text-sm text-ink-2">やり取りと案件カードの文章から、まだ候補は出ていません（候補が出ない＝安全、ではありません）。</p>
         ) : (
           <ul className="space-y-1 text-sm">
             {hinted.map((it) => (
@@ -230,7 +230,7 @@ export function CaseCardScreen() {
                 {c.items[it.id].autoHints!.map((h, i) => (
                   <VerdictBadge key={i} v={h.suggest} size="sm" />
                 ))}
-                <span className="text-xs text-gray-600">候補 {c.items[it.id].autoHints!.length} 件</span>
+                <span className="text-xs text-ink-3">候補 {c.items[it.id].autoHints!.length} 件</span>
               </li>
             ))}
           </ul>
@@ -251,7 +251,7 @@ export function CaseCardScreen() {
             </ul>
           </div>
         ) : (
-          <p className="text-xs text-gray-600">過去の案件（{(allCases?.length ?? 1) - 1}件）との一致はありません。</p>
+          <p className="text-xs text-ink-3">過去の案件（{(allCases?.length ?? 1) - 1}件）との一致はありません。</p>
         )}
       </Section>
 

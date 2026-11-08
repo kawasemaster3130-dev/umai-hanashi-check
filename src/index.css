@@ -1,49 +1,160 @@
 @import "tailwindcss";
 
+/* ───────────────────────────────────────────────
+   うまい話チェック  意匠：帳票／公文書
+   紙：生成り  墨：濃鼠  朱：印肉  藍：罫線の藍  黄土：保留
+   見出し：しっぽり明朝 B1   本文：BIZ UDPゴシック（視認性重視のUD書体）
+   番号・数字：IBM Plex Mono
+   ─────────────────────────────────────────────── */
 @theme {
-  --color-ink: #1c1c1a;
-  --color-paper: #f7f7f5;
-  --color-navy: #1f3a5f;
-  --color-navy-dark: #15293f;
-  --color-v-red: #b3261e;
-  --color-v-red-bg: #fbe9e7;
-  --color-v-yellow: #8a5a00;
-  --color-v-yellow-bg: #fff3cd;
-  --color-v-blue: #0b5cad;
-  --color-v-blue-bg: #e3effc;
-  --color-v-na: #4b5563;
-  --color-v-na-bg: #e5e7eb;
-  --color-v-unchecked: #6b7280;
-  --color-v-unchecked-bg: #f3f4f6;
+  --font-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  --font-ud: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", Meiryo, sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+
+  --color-paper: #f3eee3;
+  --color-paper-2: #faf7f0;
+  --color-paper-3: #ebe4d4;
+  --color-ink: #23211f;
+  --color-ink-2: #4a4641;
+  --color-ink-3: #7a746b;
+  --color-rule: #b9aa93;
+  --color-rule-2: #d9cfbd;
+  --color-shu: #b2321c;
+  --color-shu-bg: #f6e3dc;
+  --color-ocher: #8a6100;
+  --color-ocher-bg: #f3e6bd;
+  --color-ai: #1f4b78;
+  --color-ai-bg: #dde7f1;
+  --color-nezu: #5c5853;
+  --color-nezu-bg: #e4e0d8;
+  --color-mikan: #d9d2c3;
+
+  /* 仕様の色名（既存のクラスを壊さない） */
+  --color-navy: #23211f;
+  --color-navy-dark: #000000;
+  --color-v-red: #b2321c;
+  --color-v-red-bg: #f6e3dc;
+  --color-v-yellow: #8a6100;
+  --color-v-yellow-bg: #f3e6bd;
+  --color-v-blue: #1f4b78;
+  --color-v-blue-bg: #dde7f1;
+  --color-v-na: #5c5853;
+  --color-v-na-bg: #e4e0d8;
+  --color-v-unchecked: #7a746b;
+  --color-v-unchecked-bg: #efe9dc;
 }
 
 html { font-size: 17px; }
-body { @apply bg-paper text-ink antialiased; font-family: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif; }
+body {
+  font-family: var(--font-ud);
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  /* 薄い方眼（帳票の下地） */
+  background-image:
+    linear-gradient(to right, rgba(31, 75, 120, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(31, 75, 120, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+  font-feature-settings: "palt" 0;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, .h1, .h2, .h3, .mincho { font-family: var(--font-mincho); font-weight: 700; letter-spacing: 0.04em; }
+code, .mono { font-family: var(--font-mono); }
 
+/* ── 基本部品（@utility は @apply で参照できる） ── */
 @utility btn {
-  @apply inline-flex items-center justify-center gap-1 rounded-lg border px-4 py-2 text-base font-medium leading-tight transition disabled:cursor-not-allowed disabled:opacity-40 min-h-11;
+  @apply inline-flex items-center justify-center gap-1 px-4 py-2 text-base leading-tight transition disabled:cursor-not-allowed disabled:opacity-40 min-h-11;
+  font-family: var(--font-mincho);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border: 1.5px solid var(--color-ink);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  box-shadow: 2px 2px 0 0 var(--color-ink);
 }
 @utility input {
-  @apply w-full rounded-lg border border-gray-400 bg-white px-3 py-2 text-base leading-snug focus:outline-none focus:ring-2 focus:ring-navy;
+  @apply w-full px-3 py-2 text-base leading-snug focus:outline-none;
+  background: var(--color-paper-2);
+  border: 1px solid var(--color-rule);
+  border-bottom: 2px solid var(--color-ink);
+  color: var(--color-ink);
 }
 
 @layer components {
-  .btn-primary { @apply btn border-navy bg-navy text-white hover:bg-navy-dark; }
-  .btn-secondary { @apply btn border-gray-400 bg-white text-ink hover:bg-gray-100; }
-  .btn-danger { @apply btn border-v-red bg-white text-v-red hover:bg-v-red-bg; }
-  .btn-sm { @apply px-3 py-1 text-sm min-h-9; }
-  .card { @apply rounded-xl border border-gray-300 bg-white p-4 shadow-sm; }
-  .label { @apply block text-sm font-semibold text-gray-700 mb-1; }
+  .btn:hover:not(:disabled) { transform: translate(1px, 1px); box-shadow: 1px 1px 0 0 var(--color-ink); }
+  .btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
+  .btn-primary { @apply btn; background: var(--color-ink); color: var(--color-paper-2); }
+  .btn-secondary { @apply btn; }
+  .btn-danger { @apply btn; color: var(--color-shu); border-color: var(--color-shu); box-shadow: 2px 2px 0 0 var(--color-shu); }
+  .btn-sm { @apply px-3 py-1 text-sm min-h-9; box-shadow: 1px 1px 0 0 currentColor; }
+  .input:focus { border-bottom-color: var(--color-shu); box-shadow: inset 0 -2px 0 0 var(--color-shu); }
   .textarea { @apply input min-h-28 resize-y; }
-  .note { @apply rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-950; }
-  .note-info { @apply rounded-lg border border-sky-300 bg-sky-50 px-3 py-2 text-sm text-sky-950; }
-  .note-danger { @apply rounded-lg border border-v-red bg-v-red-bg px-3 py-2 text-sm text-v-red; }
-  .chip { @apply inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-sm font-semibold whitespace-nowrap; }
-  .link { @apply text-v-blue underline underline-offset-2 break-all; }
-  .h1 { @apply text-2xl font-bold leading-tight; }
-  .h2 { @apply text-xl font-bold leading-tight; }
-  .h3 { @apply text-lg font-bold leading-tight; }
+  .label { @apply block text-sm mb-1; color: var(--color-ink-2); font-weight: 700; }
+  .label::before { content: "▌"; color: var(--color-shu); margin-right: 0.3em; font-size: 0.8em; }
+
+  /* 伝票（カード） */
+  .card { @apply p-4; background: var(--color-paper-2); border: 1px solid var(--color-ink); outline: 1px solid var(--color-ink); outline-offset: 2px; position: relative; }
+
+  /* 注記：欄外の但し書き */
+  .note { @apply px-3 py-2 text-sm; background: var(--color-ocher-bg); border-left: 6px double var(--color-ocher); color: var(--color-ink); }
+  .note-info { @apply px-3 py-2 text-sm; background: var(--color-ai-bg); border-left: 6px double var(--color-ai); color: var(--color-ink); }
+  .note-danger { @apply px-3 py-2 text-sm; background: var(--color-shu-bg); border-left: 6px double var(--color-shu); color: var(--color-ink); }
+
+  /* 小札（チップ） */
+  .chip { @apply inline-flex items-center gap-1 px-2 py-0.5 text-sm whitespace-nowrap; border: 1px solid currentColor; font-weight: 700; font-family: var(--font-mincho); letter-spacing: 0.05em; }
+
+  .link { color: var(--color-ai); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; word-break: break-all; }
+  .link:hover { color: var(--color-shu); }
+  .h1 { @apply text-2xl leading-tight; }
+  .h2 { @apply text-xl leading-tight; }
+  .h3 { @apply text-lg leading-tight; }
+
+  /* 題（見出しの前に朱の短い罫） */
+  .dai { position: relative; padding-left: 0.9rem; }
+  .dai::before { content: ""; position: absolute; left: 0; top: 0.2em; bottom: 0.2em; width: 4px; background: var(--color-shu); }
+
+  /* 印（判定） */
+  .seal { display: inline-flex; align-items: center; justify-content: center; border: 2px solid currentColor; border-radius: 9999px; font-family: var(--font-mincho); font-weight: 700; line-height: 1; transform: rotate(-6deg); mix-blend-mode: multiply; flex: none; }
+  .seal-sm { width: 1.6rem; height: 1.6rem; font-size: 0.85rem; }
+  .seal-md { width: 2.4rem; height: 2.4rem; font-size: 1.1rem; }
+  .seal-lg { width: 3.4rem; height: 3.4rem; font-size: 1.6rem; border-width: 3px; }
+  .seal-xl { width: 5.2rem; height: 5.2rem; font-size: 2.6rem; border-width: 4px; }
+
+  /* 帳票の表 */
+  .ledger { width: 100%; border-collapse: collapse; }
+  .ledger th, .ledger td { border: 1px solid var(--color-rule); padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+  .ledger th { background: var(--color-paper-3); font-weight: 700; font-family: var(--font-mincho); white-space: nowrap; }
+
+  /* 検印欄（進み具合） */
+  .kenin { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(5.2rem, 1fr); border: 1.5px solid var(--color-ink); background: var(--color-paper-2); }
+  .kenin-cell { display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--color-ink); text-decoration: none; color: var(--color-ink); }
+  .kenin-cell:last-child { border-right: 0; }
+  .kenin-head { width: 100%; text-align: center; font-size: 0.7rem; line-height: 1.2; padding: 0.25rem 0.2rem; border-bottom: 1px solid var(--color-ink); background: var(--color-paper-3); font-family: var(--font-mincho); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kenin-body { height: 3.4rem; display: flex; align-items: center; justify-content: center; width: 100%; }
+  .kenin-cell[aria-current="page"] .kenin-head { background: var(--color-ink); color: var(--color-paper-2); }
+  .kenin-cell[aria-current="page"] .kenin-body { box-shadow: inset 0 0 0 2px var(--color-shu); }
+
+  /* 台帳の見出しタブ */
+  .index-tabs { display: flex; gap: 2px; align-items: flex-end; overflow-x: auto; padding: 0 0.25rem; }
+  .index-tab { flex: none; border: 1px solid var(--color-ink); border-bottom: 0; background: var(--color-paper-3); padding: 0.35rem 0.7rem 0.3rem; font-family: var(--font-mincho); font-weight: 700; font-size: 0.9rem; color: var(--color-ink-2); white-space: nowrap; position: relative; top: 1px; }
+  .index-tab[aria-current="page"] { background: var(--color-paper-2); color: var(--color-ink); padding-bottom: 0.45rem; box-shadow: inset 0 3px 0 0 var(--color-shu); }
+  .index-tab-flag { box-shadow: inset 0 3px 0 0 var(--color-ocher); }
+  .index-sheet { border: 1px solid var(--color-ink); background: var(--color-paper-2); padding: 1rem; }
+
+  /* 欄外の番号札 */
+  .fuda { display: inline-block; font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; padding: 0 0.4rem; border: 1px solid var(--color-ink); background: var(--color-paper-2); letter-spacing: 0.02em; }
+
+  /* 題字（ヘッダー） */
+  .daiji { background: var(--color-ink); color: var(--color-paper-2); border-bottom: 3px double var(--color-paper-2); }
 }
 
-.tabs::-webkit-scrollbar { height: 6px; }
-.tabs::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+/* ── 角丸をすべて落とす（印だけは丸） ── */
+.rounded, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl { border-radius: 0; }
+.rounded-full:not(.seal) { border-radius: 0; }
+.shadow, .shadow-sm, .shadow-xl { box-shadow: none; }
+
+.tabs::-webkit-scrollbar, .index-tabs::-webkit-scrollbar { height: 6px; }
+.tabs::-webkit-scrollbar-thumb, .index-tabs::-webkit-scrollbar-thumb { background: var(--color-rule); }
+
+/* 入力中の IME に合わせて下線を太く */
+input:focus, textarea:focus, select:focus { outline: none; }
+::selection { background: var(--color-shu-bg); }

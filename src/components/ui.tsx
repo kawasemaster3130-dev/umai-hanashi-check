@@ -7,13 +7,27 @@ export const VERDICT_CLASS: Record<Verdict, string> = {
   yellow: 'bg-v-yellow-bg text-v-yellow border-v-yellow',
   blue: 'bg-v-blue-bg text-v-blue border-v-blue',
   na: 'bg-v-na-bg text-v-na border-v-na',
-  unchecked: 'bg-v-unchecked-bg text-v-unchecked border-gray-400',
+  unchecked: 'bg-v-unchecked-bg text-v-unchecked border-rule',
 };
 
+/** 印の中の一文字 */
+export const SEAL_CHAR: Record<Verdict, string> = { red: '止', yellow: '待', blue: '可', na: '外', unchecked: '未' };
+const TEXT_CLASS: Record<Verdict, string> = { red: 'text-v-red', yellow: 'text-v-yellow', blue: 'text-v-blue', na: 'text-v-na', unchecked: 'text-v-unchecked' };
+
+export function Seal({ v, size = 'md' }: { v: Verdict; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
+  return (
+    <span className={`seal seal-${size} ${TEXT_CLASS[v]}`} aria-hidden="true">
+      {SEAL_CHAR[v]}
+    </span>
+  );
+}
+
+/** 判定の札：印＋記号＋文字（色だけに頼らない） */
 export function VerdictBadge({ v, provisional, size = 'md' }: { v: Verdict; provisional?: boolean; size?: 'sm' | 'md' | 'lg' }) {
-  const cls = size === 'lg' ? 'text-lg px-3 py-1' : size === 'sm' ? 'text-xs px-2 py-0' : '';
+  const cls = size === 'lg' ? 'text-lg px-3 py-1' : size === 'sm' ? 'text-xs px-1.5 py-0' : '';
   return (
     <span className={`chip ${VERDICT_CLASS[v]} ${cls}`} aria-label={`判定 ${VERDICT_LABEL[v]}`}>
+      <Seal v={v} size={size === 'lg' ? 'md' : 'sm'} />
       <span aria-hidden="true">{VERDICT_ICON[v]}</span>
       {VERDICT_LABEL[v]}
       {provisional && v !== 'unchecked' ? <span className="font-normal">（仮）</span> : null}
@@ -24,13 +38,15 @@ export function VerdictBadge({ v, provisional, size = 'md' }: { v: Verdict; prov
 export function OverallBadge({ o, big }: { o: Overall; big?: boolean }) {
   const meaning = o === 'red' ? 'やめる' : o === 'yellow' ? '確かめるまで払わない' : '大きな問題は見つからなかった（保証ではない）';
   return (
-    <div className={`inline-flex items-center gap-3 rounded-xl border-2 px-4 py-2 ${VERDICT_CLASS[o]}`}>
-      <span className={`${big ? 'text-4xl' : 'text-2xl'} font-extrabold leading-none`} aria-hidden="true">
-        {VERDICT_ICON[o]}
-      </span>
+    <div className={`inline-flex items-center gap-3 border-2 px-3 py-2 ${VERDICT_CLASS[o]}`} style={{ borderColor: 'currentColor' }}>
+      <Seal v={o} size={big ? 'xl' : 'lg'} />
       <span>
-        <span className={`${big ? 'text-3xl' : 'text-xl'} font-extrabold`}>{VERDICT_LABEL[o]}</span>
-        <span className="block text-sm font-semibold">{meaning}</span>
+        <span className="block text-[0.65rem] tracking-widest text-ink-2">総合判定</span>
+        <span className={`${big ? 'text-3xl' : 'text-xl'} mincho font-extrabold`}>
+          <span aria-hidden="true">{VERDICT_ICON[o]} </span>
+          {VERDICT_LABEL[o]}
+        </span>
+        <span className="block text-sm font-bold">{meaning}</span>
       </span>
     </div>
   );
@@ -39,14 +55,24 @@ export function OverallBadge({ o, big }: { o: Overall; big?: boolean }) {
 export function CountsBar({ counts, compact }: { counts: VerdictCounts; compact?: boolean }) {
   const order: Verdict[] = ['red', 'yellow', 'blue', 'na', 'unchecked'];
   return (
-    <div className={`flex flex-wrap ${compact ? 'gap-1' : 'gap-2'}`} aria-label="判定の数">
-      {order.map((v) => (
-        <span key={v} className={`chip ${VERDICT_CLASS[v]} ${compact ? 'text-xs' : ''}`}>
-          <span aria-hidden="true">{VERDICT_ICON[v]}</span>
-          {VERDICT_LABEL[v]} {counts[v]}
-        </span>
-      ))}
-    </div>
+    <table className={`ledger w-auto ${compact ? 'text-xs' : 'text-sm'}`} aria-label="判定の数">
+      <tbody>
+        <tr>
+          {order.map((v) => (
+            <th key={v} className={`${TEXT_CLASS[v]} !py-0.5`}>
+              <span aria-hidden="true">{VERDICT_ICON[v]}</span> {VERDICT_LABEL[v]}
+            </th>
+          ))}
+        </tr>
+        <tr>
+          {order.map((v) => (
+            <td key={v} className={`mono text-center font-semibold !py-0.5 ${compact ? '' : 'text-lg'}`}>
+              {counts[v]}
+            </td>
+          ))}
+        </tr>
+      </tbody>
+    </table>
   );
 }
 
@@ -78,8 +104,8 @@ export function CopyButton({ text, label = 'コピー', className = 'btn-seconda
 export function Section({ title, children, right, id }: { title: ReactNode; children: ReactNode; right?: ReactNode; id?: string }) {
   return (
     <section className="card space-y-3" id={id}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="h3">{title}</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-rule pb-2">
+        <h2 className="h3 dai">{title}</h2>
         {right}
       </div>
       {children}
@@ -92,7 +118,7 @@ export function Field({ label, children, hint }: { label: ReactNode; children: R
     <label className="block">
       <span className="label">{label}</span>
       {children}
-      {hint ? <span className="mt-1 block text-xs text-gray-600">{hint}</span> : null}
+      {hint ? <span className="mt-1 block text-xs text-ink-3">{hint}</span> : null}
     </label>
   );
 }
@@ -119,9 +145,9 @@ export function ListInput({ values, onChange, placeholder, addLabel = '追加' }
       {values.length > 0 && (
         <ul className="flex flex-wrap gap-2">
           {values.map((v, i) => (
-            <li key={`${v}-${i}`} className="inline-flex max-w-full items-center gap-1 rounded-lg border border-gray-300 bg-gray-50 px-2 py-1 text-sm">
+            <li key={`${v}-${i}`} className="inline-flex max-w-full items-center gap-1 border border-rule bg-paper-3 px-2 py-1 text-sm">
               <span className="break-all">{v}</span>
-              <button type="button" className="ml-1 rounded px-1 text-gray-600 hover:bg-gray-200" aria-label={`${v} を削除`} onClick={() => onChange(values.filter((_, j) => j !== i))}>
+              <button type="button" className="ml-1 rounded px-1 text-ink-3 hover:bg-paper-3" aria-label={`${v} を削除`} onClick={() => onChange(values.filter((_, j) => j !== i))}>
                 ×
               </button>
             </li>
@@ -159,13 +185,13 @@ export function ExternalLink({ href, children, className = 'link' }: { href: str
 
 export function Collapsible({ title, children, defaultOpen = false }: { title: ReactNode; children: ReactNode; defaultOpen?: boolean }) {
   return (
-    <details className="rounded-lg border border-gray-300 bg-white" open={defaultOpen}>
-      <summary className="cursor-pointer select-none px-3 py-2 font-semibold">{title}</summary>
-      <div className="border-t border-gray-200 px-3 py-3">{children}</div>
+    <details className="border border-ink bg-paper-2" open={defaultOpen}>
+      <summary className="mincho cursor-pointer select-none bg-paper-3 px-3 py-2 font-bold">{title}</summary>
+      <div className="border-t border-ink px-3 py-3">{children}</div>
     </details>
   );
 }
 
 export function Spinner({ label = '読み込み中…' }: { label?: string }) {
-  return <div className="p-6 text-center text-gray-600">{label}</div>;
+  return <div className="p-6 text-center text-ink-3">{label}</div>;
 }

@@ -15,12 +15,15 @@ export function ConsentModal() {
   const [busy, setBusy] = useState(false);
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="consent-title">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
-        <h2 id="consent-title" className="h2 mb-2">
-          はじめにお読みください
-        </h2>
-        <p className="mb-3 text-sm text-gray-700">このアプリは、人から勧められた投資の話を、お金を払う前に41項目で点検するためのものです。</p>
-        <ul className="mb-4 list-disc space-y-2 pl-5">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto border border-ink bg-paper-2 p-5 outline outline-1 outline-offset-4 outline-ink">
+        <div className="mb-2 flex items-center gap-3">
+          <span className="seal seal-lg text-shu">注</span>
+          <h2 id="consent-title" className="h2">
+            はじめにお読みください
+          </h2>
+        </div>
+        <p className="mb-3 text-sm text-ink-2">このアプリは、人から勧められた投資の話を、お金を払う前に41項目で点検するためのものです。</p>
+        <ul className="mb-4 space-y-2 border-y border-rule py-3 pl-5 list-[\'一\'] marker:text-shu">
           {CONSENT_POINTS.map((p) => (
             <li key={p}>{p}</li>
           ))}

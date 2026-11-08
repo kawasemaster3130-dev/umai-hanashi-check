@@ -50,7 +50,7 @@ export function SheetScreen() {
     <div className="space-y-4">
       <StepBar />
       <h2 className="h2">ステップ7　判定の1枚</h2>
-      <p className="text-sm text-gray-700">アプリが数えて作ります（AIにまとめさせません）。A4縦1枚。印刷・PDF保存・家族への共有に使います。</p>
+      <p className="text-sm text-ink-2">アプリが数えて作ります（AIにまとめさせません）。A4縦1枚。印刷・PDF保存・家族への共有に使います。</p>
 
       <Section title="確定する">
         <label className="block sm:max-w-sm">
@@ -111,7 +111,7 @@ export function SheetScreen() {
         }
       >
         <SheetFrame html={shown} />
-        <div className="text-xs text-gray-700">{SHARE_CAUTION}</div>
+        <div className="text-xs text-ink-2">{SHARE_CAUTION}</div>
       </Section>
 
       <div className="flex justify-between">

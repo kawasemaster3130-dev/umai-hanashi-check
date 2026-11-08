@@ -87,47 +87,42 @@ export function ChecklistScreen() {
             赤{counts.red}件の時点で打ち切り中です。残り{counts.unchecked}項目は未調査（黄として数える）のまま、判定の1枚を確定できます。原本どおり、赤が出たら{ctx.rules.earlyStopMinutes}分で切り上げてかまいません。
           </div>
         )}
-        <div className="rounded-lg border border-navy bg-sky-50 p-3">
-          <div className="mb-1 font-bold">自分で必ず開く4項目（AIの答えは当てにしない）</div>
+        <div className="border border-ink bg-paper-3 p-3">
+          <div className="mincho mb-1 font-bold">自分で必ず開く4項目（AIの答えは当てにしない）</div>
           <div className="flex flex-wrap gap-2">
             {selfItems.map((it) => {
               const r = getResult(c.items, it.id);
               const ok = r.checkedBy === 'self' && r.verdict !== 'unchecked' && (r.urls.length + r.screenshots.length) > 0;
               return (
-                <button key={it.id} type="button" className={`chip ${ok ? 'border-green-700 bg-green-50 text-green-900' : 'border-gray-500 bg-white text-gray-800'}`} onClick={() => jumpTo(it.id)}>
-                  {ok ? '✓' : '□'} {it.id} <VerdictBadge v={r.verdict} provisional={r.provisional} size="sm" />
+                <button key={it.id} type="button" className={`chip ${ok ? 'bg-paper-2 text-shu' : 'bg-paper-2 text-ink-2'}`} onClick={() => jumpTo(it.id)}>
+                  {ok ? '㊞' : '□'} <span className="mono">{it.id}</span> <VerdictBadge v={r.verdict} provisional={r.provisional} size="sm" />
                 </button>
               );
             })}
           </div>
-          <div className="mt-1 text-xs text-gray-700">金融庁の一覧（PDF）はパソコンで見ることを勧めます。会社名をコピー → 開く → Ctrl+F。</div>
+          <div className="mt-1 text-xs text-ink-2">金融庁の一覧（PDF）はパソコンで見ることを勧めます。会社名をコピー → 開く → Ctrl+F。</div>
         </div>
       </div>
 
-      <nav className="tabs -mx-4 flex gap-1 overflow-x-auto px-4 pb-1" aria-label="分類">
+      <nav className="index-tabs -mx-4 px-4" aria-label="分類">
         {CATEGORIES.map((k) => {
           const cc = catCounts(k.no);
           const active = k.no === cat;
           const flagged = c.review.flaggedCategories.includes(k.no);
           return (
-            <button
-              key={k.no}
-              type="button"
-              className={`shrink-0 rounded-lg border px-3 py-1.5 text-sm whitespace-nowrap ${active ? 'border-navy bg-navy text-white' : 'border-gray-400 bg-white'} ${flagged && !active ? 'border-amber-600' : ''}`}
-              aria-current={active ? 'page' : undefined}
-              onClick={() => setSp({ cat: String(k.no) })}
-            >
-              <span className="font-bold">{k.no}</span> {k.title}
-              <span className={`ml-1 text-xs ${active ? 'text-white/80' : 'text-gray-600'}`}>
+            <button key={k.no} type="button" className={`index-tab ${flagged && !active ? 'index-tab-flag' : ''}`} aria-current={active ? 'page' : undefined} onClick={() => setSp({ cat: String(k.no) })}>
+              <span className="mono mr-1">{k.no}</span>
+              {k.title}
+              <span className="mono ml-1 text-xs font-normal">
                 {cc.done}/{cc.total}
-                {cc.red ? ` 赤${cc.red}` : ''}
+                {cc.red ? <span className="text-shu"> 止{cc.red}</span> : ''}
               </span>
             </button>
           );
         })}
       </nav>
 
-      <section className="space-y-3">
+      <section className="index-sheet space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="h2">
             分類{cat}　{category?.title}
@@ -138,7 +133,7 @@ export function ChecklistScreen() {
             </Link>
           )}
         </div>
-        {guide && <p className="text-sm text-gray-700">{guide.intro}</p>}
+        {guide && <p className="text-sm text-ink-2">{guide.intro}</p>}
         {cardOnly && <div className="note">この分類は検索しなくても、手元のやり取りと案件カードだけで判定できます。何も見つからず迷ったら、分類7と9を先に見ます。</div>}
         {cat >= 1 && cat <= 3 && <div className="note">「載っていない」は安全の意味ではありません。似た名前・英語名・略称・前の名前でも探します。</div>}
         {c.review.flaggedCategories.includes(cat) && <div className="note">見落としチェックで、この分類に指摘がありました。指摘された項目だけでなく、この分類の全項目を見直して「見直し済み」にしてください。</div>}
@@ -150,13 +145,13 @@ export function ChecklistScreen() {
         {cat >= 4 && cat <= 6 && (
           <Collapsible title={`ステップ4：検索の言葉（${searchLines.length}行。1行ずつコピーして検索）`} defaultOpen={cat === 5}>
             {searchLines.length === 0 ? (
-              <p className="text-sm text-gray-700">案件カードに代表者・会社名・紹介者・口座名義を入れると、ここに検索の言葉が出ます。</p>
+              <p className="text-sm text-ink-2">案件カードに代表者・会社名・紹介者・口座名義を入れると、ここに検索の言葉が出ます。</p>
             ) : (
               <ul className="space-y-1">
                 {searchLines.map((l, i) => (
                   <li key={i} className="flex flex-wrap items-center gap-2 text-sm">
-                    <span className="text-xs text-gray-600">{l.label}</span>
-                    <code className="rounded bg-gray-100 px-1.5 py-0.5">{l.query}</code>
+                    <span className="text-xs text-ink-3">{l.label}</span>
+                    <code className="bg-paper-3 px-1.5 py-0.5">{l.query}</code>
                     <CopyButton text={l.query} className="btn-secondary btn-sm !min-h-7 !py-0 text-xs" />
                     <ExternalLink href={googleSearchUrl(l.query)} className="btn-secondary btn-sm !min-h-7 !py-0 text-xs no-underline">
                       検索を開く
@@ -165,7 +160,7 @@ export function ChecklistScreen() {
                 ))}
               </ul>
             )}
-            <p className="mt-2 text-xs text-gray-700">同じ名前の別人に注意：会社名・地名・時期・SNSアカウントのうち2つ以上が一致してはじめて同じ人とみなします。</p>
+            <p className="mt-2 text-xs text-ink-2">同じ名前の別人に注意：会社名・地名・時期・SNSアカウントのうち2つ以上が一致してはじめて同じ人とみなします。</p>
           </Collapsible>
         )}
         {catItems.map((it) => (

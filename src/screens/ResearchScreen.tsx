@@ -22,7 +22,7 @@ export function ResearchScreen() {
       <StepBar />
       <h2 className="h2">ステップ2　AIに下調べをさせる</h2>
       <div className="note-danger font-semibold">AIの答えに「登録あり」「問題なし」と書いてあっても、そのまま信じません。登録の有無は、金融庁の一覧を自分で開いて確かめます（1-1・1-2・1-3・2-1）。</div>
-      <p className="text-sm text-gray-700">ウェブ検索ができるAI（Claude・ChatGPT・Gemini など、検索機能をオンにしたもの）で使ってください。どのAIでも動く依頼文です。検索ができるAIがなければ、省略して自分で調べます。</p>
+      <p className="text-sm text-ink-2">ウェブ検索ができるAI（Claude・ChatGPT・Gemini など、検索機能をオンにしたもの）で使ってください。どのAIでも動く依頼文です。検索ができるAIがなければ、省略して自分で調べます。</p>
 
       <Section title="1. 依頼文を作ってコピー">
         {piWarn.length > 0 && (
@@ -40,15 +40,15 @@ export function ResearchScreen() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <CopyButton text={prompt} label="依頼文をコピー" className="btn-primary" />
-          <span className="text-xs text-gray-600">{items.length}項目のID単位で、決まった形（JSON）で返させます。</span>
+          <span className="text-xs text-ink-3">{items.length}項目のID単位で、決まった形（JSON）で返させます。</span>
         </div>
         <details>
-          <summary className="cursor-pointer text-sm text-gray-700">依頼文を見る</summary>
+          <summary className="cursor-pointer text-sm text-ink-2">依頼文を見る</summary>
           <textarea readOnly className="textarea mt-2 min-h-60 text-xs" value={prompt} />
         </details>
       </Section>
 
-      <Section title="2. 返ってきた答えを貼って取り込む" right={aiCount ? <span className="text-sm text-gray-700">取り込み済み {aiCount} 項目</span> : null}>
+      <Section title="2. 返ってきた答えを貼って取り込む" right={aiCount ? <span className="text-sm text-ink-2">取り込み済み {aiCount} 項目</span> : null}>
         <Field label="AIの答え（全文を貼ってかまいません）">
           <TextArea value={paste} onChange={setPaste} rows={8} placeholder="```json … ``` の部分だけを読み、各項目に「仮」の判定・結果メモ・URLを入れます。" />
         </Field>
@@ -132,7 +132,7 @@ export function ResearchScreen() {
         )}
         {c.aiResearchRaw && (
           <details>
-            <summary className="cursor-pointer text-sm text-gray-700">保存されているAIの答え（全文）</summary>
+            <summary className="cursor-pointer text-sm text-ink-2">保存されているAIの答え（全文）</summary>
             <textarea readOnly className="textarea mt-2 min-h-40 text-xs" value={c.aiResearchRaw} />
           </details>
         )}

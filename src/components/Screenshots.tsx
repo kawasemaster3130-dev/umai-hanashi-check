@@ -8,15 +8,15 @@ function Thumb({ id, onRemove }: { id: string; onRemove: () => void }) {
     <figure className="relative w-28">
       {url ? (
         <a href={url} target="_blank" rel="noopener noreferrer">
-          <img src={url} alt={name ?? 'スクリーンショット'} className="h-20 w-28 rounded-lg border border-gray-300 object-cover" />
+          <img src={url} alt={name ?? 'スクリーンショット'} className="h-20 w-28 border border-ink object-cover" />
         </a>
       ) : (
-        <div className="h-20 w-28 rounded-lg border border-dashed border-gray-300 bg-gray-50 text-center text-xs leading-[5rem] text-gray-500">読み込み中</div>
+        <div className="h-20 w-28 border border-dashed border-rule bg-paper-3 text-center text-xs leading-[5rem] text-ink-3">読み込み中</div>
       )}
-      <figcaption className="truncate text-xs text-gray-600" title={name}>
+      <figcaption className="truncate text-xs text-ink-3" title={name}>
         {name}
       </figcaption>
-      <button type="button" className="absolute -right-1 -top-1 rounded-full border border-gray-400 bg-white px-1.5 text-xs" aria-label="このスクリーンショットを外す" onClick={onRemove}>
+      <button type="button" className="absolute -right-1 -top-1 border border-ink bg-paper-2 px-1.5 text-xs" aria-label="このスクリーンショットを外す" onClick={onRemove}>
         ×
       </button>
     </figure>

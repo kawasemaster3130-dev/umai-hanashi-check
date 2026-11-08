@@ -22,11 +22,11 @@ export function NextScreen() {
       {overall === 'red' && (
         <Section title="赤：払いません">
           <p>やめる理由になる事実が{counts.red}件あります。払いません。理由の言い合いはしません。相手に送る文はこれだけで足ります。</p>
-          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 p-3">
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-rule bg-paper-3 p-3">
             <span className="font-semibold">「{DECLINE_MESSAGE}」</span>
             <CopyButton text={DECLINE_MESSAGE} label="この文をコピー" />
           </div>
-          <p className="text-sm text-gray-700">送ったあと、追加の説明を求められても答えなくてかまいません。連絡をやめてもかまいません。</p>
+          <p className="text-sm text-ink-2">送ったあと、追加の説明を求められても答えなくてかまいません。連絡をやめてもかまいません。</p>
         </Section>
       )}
       {overall === 'yellow' && (
@@ -41,7 +41,7 @@ export function NextScreen() {
                     {it.id}
                   </Link>{' '}
                   {it.question}
-                  <div className="text-xs text-gray-800">{r.verdict === 'unchecked' ? '未調査。' : ''}確かめること：{it.yellow ?? it.red ?? it.question}{r.memo ? `／メモ：${r.memo}` : ''}</div>
+                  <div className="text-xs text-ink-2">{r.verdict === 'unchecked' ? '未調査。' : ''}確かめること：{it.yellow ?? it.red ?? it.question}{r.memo ? `／メモ：${r.memo}` : ''}</div>
                 </li>
               );
             })}
@@ -55,17 +55,17 @@ export function NextScreen() {
       )}
 
       <Section title="家族に見せる">
-        <p className="text-sm text-gray-700">判定の1枚を印刷・PDFにして、家族や信頼できる人に見せます。一人で決めないことが、いちばんの守りです。</p>
+        <p className="text-sm text-ink-2">判定の1枚を印刷・PDFにして、家族や信頼できる人に見せます。一人で決めないことが、いちばんの守りです。</p>
         <div className="flex flex-wrap gap-2">
           <Link to={`/case/${c.id}/sheet`} className="btn-primary">
             判定の1枚を開く（印刷・PDF）
           </Link>
         </div>
-        <div className="text-xs text-gray-700">{SHARE_CAUTION}</div>
+        <div className="text-xs text-ink-2">{SHARE_CAUTION}</div>
       </Section>
 
       <Section title="すでに払ってしまったとき">
-        <p className="text-sm text-gray-700">追加では払わず、少額で出金を試し、やり取りを保存し、相談窓口へ。「取り戻します」と連絡してくる業者には注意します。</p>
+        <p className="text-sm text-ink-2">追加では払わず、少額で出金を試し、やり取りを保存し、相談窓口へ。「取り戻します」と連絡してくる業者には注意します。</p>
         <Link to={`/case/${c.id}/paid`} className="btn-secondary">
           すでに払ってしまった人へ →
         </Link>
