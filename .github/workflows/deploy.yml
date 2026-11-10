@@ -6,6 +6,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17 19 * * 0' # 毎週月曜の朝4時17分（日本時間）に、金融庁の一覧を取り直して公開し直す
 
 permissions:
   contents: read
@@ -26,6 +28,9 @@ jobs:
           node-version: 22
       - run: npm install --legacy-peer-deps
       - run: npm test
+      - name: 金融庁の一覧を取り込む（失敗しても公開は続ける）
+        run: node scripts/fetch-fsa.mjs
+        continue-on-error: true
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/

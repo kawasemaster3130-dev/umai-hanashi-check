@@ -1,0 +1,8 @@
+{
+  "note": "アプリに取り込む金融庁の一覧。kind=registered は登録を受けている業者、warned は無登録で警告を受けた者。URLが変わったらここを直す。",
+  "sources": [
+    { "key": "kinsho", "name": "金融商品取引業者の一覧", "kind": "registered", "format": "xlsx", "url": "https://www.fsa.go.jp/menkyo/menkyoj/kinyushohin.xlsx" },
+    { "key": "crypto", "name": "暗号資産交換業者の一覧", "kind": "registered", "format": "xlsx", "url": "https://www.fsa.go.jp/menkyo/menkyoj/kasoutuka.xlsx" },
+    { "key": "warn", "name": "無登録で金融商品取引業を行う者の名称等について（警告）", "kind": "warned", "format": "html", "url": "https://www.fsa.go.jp/ordinary/chuui/mutouroku/04.html" }
+  ]
+}
