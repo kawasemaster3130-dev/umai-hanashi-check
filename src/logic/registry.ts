@@ -10,7 +10,8 @@ export interface RegisteredEntry {
   addr?: string;
   tel?: string;
   date?: string;
-  types: string[];
+  types: string[]; // できる仕事（業務の種別）
+  assoc?: string[]; // 加入している協会
 }
 export interface WarnedEntry {
   name: string;

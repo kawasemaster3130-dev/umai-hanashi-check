@@ -46,7 +46,8 @@ export function RegistryPanel({ r, big }: { r: RegistryLookup; big?: boolean }) 
               <div className="text-sm">
                 {SOURCE_LABEL[e.s] ?? e.s}／{e.no}
               </div>
-              {e.types.length > 0 && <div className="text-sm">できる仕事：{e.types.join('・')}</div>}
+              {e.types.length > 0 && <div className="text-sm font-bold">できる仕事：{e.types.join('・')}</div>}
+              {(e.assoc?.length ?? 0) > 0 && <div className="text-sm">加入している協会：{e.assoc!.join('・')}</div>}
               {(e.addr || e.tel) && (
                 <div className="text-sm">
                   {e.addr}

@@ -47,6 +47,9 @@ function entriesFromXlsx(buf) {
       const label = clean(`${head[i] ?? ''}${sub[i] ? ` ${sub[i]}` : ''}`);
       if (label && label.length <= 30 && !/(備考|加入協会|取扱|合計|ホームページ|URL)/.test(label)) typeCols.push({ i, label: label.replace(/\s+/g, '') });
     }
+    // 2段見出しの上の段の言葉（「業務の種別」「加入金融商品取引業協会」）を外す
+    const tidy = (l) => l.replace(/^業務の種別/, '').replace(/^加入金融商品取引業協会(?=.)/, '');
+    const marked = (r) => typeCols.filter((t) => /[○〇◯●✓]/.test(r[t.i] ?? '')).map((t) => tidy(t.label)).filter(Boolean);
     for (const r of rows.slice(hi + 1)) {
       const no = r[cNo] ?? '';
       if (!/第\s*[0-9０-９]+\s*号/.test(no)) continue;
@@ -59,7 +62,8 @@ function entriesFromXlsx(buf) {
         addr: cAddr >= 0 ? r[cAddr] || undefined : undefined,
         tel: cTel >= 0 ? r[cTel] || undefined : undefined,
         date: cDate >= 0 ? r[cDate] || undefined : undefined,
-        types: typeCols.filter((t) => /[○〇◯●✓]/.test(r[t.i] ?? '')).map((t) => t.label),
+        types: marked(r).filter((l) => !/協会/.test(l)),
+        assoc: marked(r).filter((l) => /協会/.test(l)),
       });
     }
     console.log(`     シート「${sheetName}」見出し: 番号=${cNo} 名前=${cName} 住所=${cAddr} 電話=${cTel} 種別の列=${typeCols.map((t) => t.label).join('|')}`);
