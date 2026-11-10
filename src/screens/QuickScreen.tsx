@@ -18,6 +18,7 @@ export function QuickScreen() {
   const [result, setResult] = useState<QuickResult | null>(null);
   const [ocr, setOcr] = useState<{ busy: boolean; msg: string }>({ busy: false, msg: '' });
   const fileRef = useRef<HTMLInputElement>(null);
+  const [emptyMsg, setEmptyMsg] = useState(false);
   const items = activeItemsFor(settings);
 
   const run = () => {
@@ -54,9 +55,9 @@ export function QuickScreen() {
     <div className="k-wrap">
       <div className="k-title">
         <Seal v="unchecked" size="lg" />
-        <h1 className="h1">この話、だいじょうぶ？</h1>
+        <h1 className="h1">新しい話をパッとチェック</h1>
       </div>
-      <p className="k-lead">言われたことを貼るか、スクショを選ぶか、会社の名前を入れてください。すぐに見ます。</p>
+      <p className="k-lead">言われたことを貼る・スクショを選ぶ・名前を入れる。どれか1つで、赤いボタンを押すだけ。</p>
 
       <label className="block">
         <span className="label text-base">言われたこと（LINE・DM・メールの文）</span>
@@ -74,9 +75,25 @@ export function QuickScreen() {
         <span className="label text-base">会社の名前・話の名前・人の名前・電話番号（いくつでも。空白で区切る）</span>
         <input className="input text-lg" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="例：◯◯キャピタル ゴールドプラン 03-0000-0000" onKeyDown={(e) => e.key === 'Enter' && run()} />
       </label>
-      <button type="button" className="k-btn k-btn-ink" onClick={run} disabled={!text.trim() && !query.trim()}>
-        チェックする
-      </button>
+      <div className="sos-wrap">
+        <button
+          type="button"
+          className="sos-btn"
+          aria-label="チェック"
+          onClick={() => {
+            if (!text.trim() && !query.trim()) {
+              setEmptyMsg(true);
+              return;
+            }
+            setEmptyMsg(false);
+            run();
+          }}
+        >
+          チェック
+        </button>
+        <div className="sos-cap">押すと、すぐに見ます</div>
+        {emptyMsg && <p className="note-danger text-lg">上に、言われたことを貼るか、スクショを選ぶか、名前を入れてから押してください。</p>}
+      </div>
 
       {result && (
         <div id="quick-result" className="flex flex-col gap-4 pt-4">

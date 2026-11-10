@@ -188,3 +188,17 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .k-hit { display: flex !important; align-items: flex-start; gap: 0.5rem; padding-left: 0 !important; text-indent: 0 !important; }
 .k-hit::before { content: none !important; }
 .k-hit .seal { margin-top: 0.15rem; }
+
+/* ── 赤い丸の押しボタン（非常ボタンの形）：このアプリの主役 ── */
+.sos-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 0.5rem 0; }
+.sos-btn { position: relative; width: 11rem; height: 11rem; border-radius: 9999px !important; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #fff; font-family: var(--font-mincho); font-weight: 800; font-size: 2.1rem; letter-spacing: 0.12em; line-height: 1.1;
+  background: radial-gradient(circle at 35% 28%, #e8573f 0%, #c4361f 45%, #96230f 100%);
+  box-shadow: 0 0 0 6px var(--color-paper-2), 0 0 0 9px var(--color-shu), 0 0 0 10px var(--color-ink), 0 12px 0 4px #6d1a0b, 0 18px 18px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s, box-shadow 0.08s; -webkit-tap-highlight-color: transparent; }
+.sos-btn small { font-size: 0.8rem; letter-spacing: 0.25em; font-weight: 700; opacity: 0.9; margin-bottom: 0.2rem; }
+.sos-btn:hover { filter: brightness(1.06); }
+.sos-btn:active { transform: translateY(9px); box-shadow: 0 0 0 6px var(--color-paper-2), 0 0 0 9px var(--color-shu), 0 0 0 10px var(--color-ink), 0 3px 0 4px #6d1a0b, 0 5px 8px rgba(0, 0, 0, 0.35); }
+.sos-btn:focus-visible { outline: 4px solid var(--color-ink); outline-offset: 12px; }
+.sos-btn-sm { width: 8rem; height: 8rem; font-size: 1.55rem; }
+.sos-cap { font-family: var(--font-mincho); font-weight: 800; font-size: 1.15rem; letter-spacing: 0.08em; margin-top: 0.9rem; }
+.nav-check { background: var(--color-shu); color: #fff !important; font-weight: 800; padding: 0.2rem 0.6rem !important; border-radius: 9999px !important; margin-right: 0.25rem; }

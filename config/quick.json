@@ -13,9 +13,37 @@
     "9-3": "有名人の名前"
   },
   "actions": [
-    { "key": "fsa", "label": "国の登録を見る（金融庁）", "linkKey": "fsa_search", "copy": "name", "how": "会社の名前をコピーしてあります。開いたら貼って検索。" },
-    { "key": "warn", "label": "警告の一覧を見る（金融庁）", "linkKey": "fsa_mutouroku_sp", "copy": "name", "how": "開いたらページ内検索で会社の名前を探す。" },
-    { "key": "web", "label": "ネットで評判を見る", "search": "{{name}} 詐欺 OR 被害 OR 返金", "how": "同じ名前の別の会社に注意。" },
-    { "key": "phone", "label": "電話番号で検索", "search": "\"{{phone}}\"", "how": "番号だけで検索。" }
+    {
+      "key": "fsa",
+      "label": "国の登録を見る（金融庁）",
+      "linkKey": "fsa_list",
+      "copy": "name",
+      "how": "金融庁の「登録を受けている業者一覧」が開きます。上のほうの検索か、業種の一覧（PDF）で会社の名前を探します。"
+    },
+    {
+      "key": "warn",
+      "label": "警告の一覧を見る（金融庁）",
+      "linkKey": "fsa_mutouroku_sp",
+      "copy": "name",
+      "how": "開いたら「ページ内検索」で会社の名前を探します。載っていたら、やめる理由です。"
+    },
+    {
+      "key": "site",
+      "label": "金融庁のサイトの中をさがす",
+      "search": "site:fsa.go.jp {{name}}",
+      "how": "金融庁のページに名前が出ているかを、検索でまとめて見ます。"
+    },
+    {
+      "key": "web",
+      "label": "ネットで評判を見る",
+      "search": "{{name}} 詐欺 OR 被害 OR 返金",
+      "how": "同じ名前の別の会社に注意。"
+    },
+    {
+      "key": "phone",
+      "label": "電話番号で検索",
+      "search": "\"{{phone}}\"",
+      "how": "番号だけで検索。"
+    }
   ]
 }

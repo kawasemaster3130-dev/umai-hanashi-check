@@ -24,9 +24,12 @@ export function Home() {
   return (
     <div className="space-y-4">
       <PageTitle title="保存した記録" sub="調べた話の一覧です。新しく調べるときは、上の題字から「この話、だいじょうぶ？」へ。" />
-      <Link to="/" className="k-btn k-btn-ink">
-        新しい話をぱっとチェック
-      </Link>
+      <div className="sos-wrap">
+        <Link to="/" className="sos-btn" aria-label="チェック（新しい話をパッとチェック）">
+          チェック
+        </Link>
+        <div className="sos-cap">新しい話をパッとチェック</div>
+      </div>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-primary text-lg" onClick={newCase}>
           ＋ くわしく調べる（41項目）

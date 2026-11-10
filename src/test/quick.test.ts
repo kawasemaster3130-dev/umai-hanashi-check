@@ -20,9 +20,11 @@ describe('ぱっとチェック', () => {
   it('何もなければ none（安全の意味ではない）', () => {
     expect(quickCheck({ text: '明日の予定を教えて', query: '' }, [], keywords, items, NOW).level).toBe('none');
   });
-  it('会社名を入れると、国の登録・警告・評判の3つのボタンと、過去の案件との一致が出る', () => {
+  it('会社名を入れると、国の登録・警告・金融庁内検索・評判のボタンと、過去の案件との一致が出る', () => {
     const r = quickCheck({ text: '', query: 'ミライ架空キャピタル' }, [demo as unknown as Case], keywords, items, NOW);
-    expect(r.actions.map((a) => a.key)).toEqual(['fsa', 'warn', 'web']);
+    expect(r.actions.map((a) => a.key)).toEqual(['fsa', 'warn', 'site', 'web']);
+    expect(r.actions[0].url).toBe('https://www.fsa.go.jp/menkyo/menkyo.html');
+    expect(r.actions[2].url).toContain('site%3Afsa.go.jp');
     expect(r.actions[0].copy).toBe('ミライ架空キャピタル');
     expect(r.past.length).toBeGreaterThan(0);
     expect(r.past[0].caseName).toBe('ゴールドAIプラン');
@@ -51,7 +53,7 @@ describe('複数の言葉・案件名', () => {
   it('空白で区切った複数の言葉は、すべて含む記録だけ。電話番号は番号検索に', () => {
     const ok = quickCheck({ text: '', query: 'ゴールド ミライ 03-0000-0000' }, [demo as unknown as Case], keywords, items, NOW);
     expect(ok.past.length).toBeGreaterThan(0);
-    expect(ok.actions.map((a) => a.key)).toEqual(['fsa', 'warn', 'web', 'phone:03-0000-0000']);
+    expect(ok.actions.map((a) => a.key)).toEqual(['fsa', 'warn', 'site', 'web', 'phone:03-0000-0000']);
     expect(ok.actions[0].copies).toEqual(['ゴールド', 'ミライ']);
     expect(ok.draft.card.companyNames).toEqual(['ゴールド', 'ミライ']);
     const ng = quickCheck({ text: '', query: 'ゴールド 別の会社' }, [demo as unknown as Case], keywords, items, NOW);

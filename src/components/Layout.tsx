@@ -16,6 +16,9 @@ export function Shell({ children }: { children: ReactNode }) {
             うまい話チェック
           </NavLink>
           <nav className="mincho flex shrink-0 items-center gap-0 text-[0.8rem] sm:gap-0.5 sm:text-sm" aria-label="メニュー">
+            <NavLink to="/" className="nav-check whitespace-nowrap">
+              チェック
+            </NavLink>
             {[
               ['/cases', '記録'],
               ['/guides', '手引き'],

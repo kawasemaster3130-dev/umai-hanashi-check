@@ -9,7 +9,7 @@ import { nowIso, ymd } from '../logic/util';
 import { Seal, Spinner } from '../components/ui';
 import { VERDICT_ICON, VERDICT_LABEL } from '../types';
 
-const FSA = linkByKey('fsa_search')?.url ?? 'https://search.fsa.go.jp/';
+const FSA = linkByKey('fsa_list')?.url ?? 'https://www.fsa.go.jp/menkyo/menkyo.html';
 
 function BigButton({ children, onClick, tone = 'plain', to }: { children: React.ReactNode; onClick?: () => void; tone?: 'plain' | 'ink' | 'shu'; to?: string }) {
   const cls = `k-btn ${tone === 'ink' ? 'k-btn-ink' : tone === 'shu' ? 'k-btn-shu' : ''}`;
@@ -176,9 +176,12 @@ function Result() {
       <Link className="link mt-4 block text-center text-lg" to={`/kantan/${c.id}?q=1`}>
         答えを直す
       </Link>
-      <Link className="link block text-center text-lg" to="/kantan">
-        最初から
-      </Link>
+      <div className="sos-wrap">
+        <Link to="/" className="sos-btn sos-btn-sm" aria-label="チェック（新しい話をパッとチェック）">
+          チェック
+        </Link>
+        <div className="sos-cap">新しい話をパッとチェック</div>
+      </div>
     </div>
   );
 }
