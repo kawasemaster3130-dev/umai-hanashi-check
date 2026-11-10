@@ -7,6 +7,9 @@ import type { KantanAnswer } from '../types';
 import { linkByKey, contacts } from '../data/config';
 import { nowIso, ymd } from '../logic/util';
 import { Seal, Spinner } from '../components/ui';
+import { RegistryPanel } from '../components/RegistryPanel';
+import { useRegistry } from '../app/hooks';
+import { lookupRegistry } from '../logic/registry';
 import { VERDICT_ICON, VERDICT_LABEL } from '../types';
 
 const FSA = linkByKey('fsa_list')?.url ?? 'https://www.fsa.go.jp/menkyo/menkyo.html';
@@ -65,6 +68,7 @@ function Question() {
   const q = kantan.questions[n - 1];
   const total = kantan.questions.length;
   const answers = c.kantan?.answers ?? {};
+  const registryData = useRegistry();
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [n]);
@@ -102,6 +106,7 @@ function Question() {
           </ul>
         </div>
       )}
+      {q.type === 'registry' && <RegistryPanel r={lookupRegistry(registryData ?? undefined, { names: c.card.companyNames, phones: c.card.companyPhone ? [c.card.companyPhone] : [], text: c.rawMessages })} big />}
       {q.type === 'registry' && (
         <a className="k-btn k-btn-ink" href={FSA} target="_blank" rel="noopener noreferrer">
           金融庁のページを開く

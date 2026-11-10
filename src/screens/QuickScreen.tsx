@@ -1,17 +1,21 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCases, useSettings, activeItemsFor } from '../app/hooks';
+import { useCases, useRegistry, useSettings, activeItemsFor } from '../app/hooks';
+import { RegistryPanel } from '../components/RegistryPanel';
+import { VerdictBadge } from '../components/ui';
 import { saveCase } from '../app/store';
 import { keywords } from '../data/config';
 import { quickCheck, type QuickResult } from '../logic/quick';
 import { recognizeImages } from '../logic/ocr';
 import { applyAutoHints, computeAutoHints } from '../logic/hints';
 import { nowIso, uuid, ymd, formatDate } from '../logic/util';
+import { countVerdicts } from '../logic/verdict';
 import { CopyButton, Seal } from '../components/ui';
 
 export function QuickScreen() {
   const cases = useCases();
   const settings = useSettings();
+  const registry = useRegistry();
   const navigate = useNavigate();
   const [text, setText] = useState('');
   const [query, setQuery] = useState('');
@@ -23,18 +27,25 @@ export function QuickScreen() {
 
   const run = () => {
     if (!text.trim() && !query.trim()) return;
-    setResult(quickCheck({ text, query }, cases ?? [], keywords, items, nowIso()));
+    setResult(quickCheck({ text, query }, cases ?? [], keywords, items, nowIso(), registry));
     setTimeout(() => document.getElementById('quick-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
 
   const startCase = async (to: 'kantan' | 'card') => {
-    const r = result ?? quickCheck({ text, query }, cases ?? [], keywords, items, nowIso());
+    const r = result ?? quickCheck({ text, query }, cases ?? [], keywords, items, nowIso(), registry);
+    // 同じ内容の作りかけ（判定をまだ入れていない記録）があれば、それを使う。同じ記録を増やさない
+    const same = (cases ?? []).find((x) => x.rawMessages === r.draft.rawMessages && JSON.stringify(x.card.companyNames) === JSON.stringify(r.draft.card.companyNames) && (x.card.companyPhone ?? '') === (r.draft.card.companyPhone ?? '') && countVerdicts(items, x.items).unchecked === items.length);
+    if (same) {
+      if (to === 'kantan' && !same.kantan) await saveCase({ ...same, kantan: { answers: {} } });
+      navigate(to === 'kantan' ? `/kantan/${same.id}?q=1` : `/case/${same.id}/check`);
+      return;
+    }
     const c = { ...r.draft, id: uuid(), createdAt: nowIso(), updatedAt: nowIso() };
     if (!c.card.caseName) c.card.caseName = c.card.companyNames[0] ? `${c.card.companyNames[0]}の話` : `チェック ${ymd()}`;
     applyAutoHints(c, computeAutoHints(c, keywords, items), items);
     if (to === 'kantan') c.kantan = { answers: {} };
     await saveCase(c);
-    navigate(to === 'kantan' ? `/kantan/${c.id}?q=1` : `/case/${c.id}/card`);
+    navigate(to === 'kantan' ? `/kantan/${c.id}?q=1` : `/case/${c.id}/check`);
   };
 
   const onFiles = async (files: File[]) => {
@@ -97,11 +108,13 @@ export function QuickScreen() {
 
       {result && (
         <div id="quick-result" className="flex flex-col gap-4 pt-4">
-          <div className={`k-result k-result-${result.level === 'none' ? 'blue' : result.level}`}>
-            <Seal v={result.level === 'none' ? 'blue' : result.level} size="xl" />
-            <h2 className="k-q">{result.level === 'red' ? 'やめる理由になる言葉があります' : result.level === 'yellow' ? '気になる言葉があります' : '言葉からは見つかりませんでした'}</h2>
-            <p className="k-sub">{result.level === 'none' ? '安全という意味ではありません。下のボタンで、国の登録と評判を自分で見てください。' : '下に、見つかった言葉を出します。'}</p>
+          <div className={`k-result ${result.level === 'none' ? '' : `k-result-${result.level}`}`}>
+            <Seal v={result.level === 'none' ? 'unchecked' : result.level} size="xl" />
+            <h2 className="k-q">{result.headline.title}</h2>
+            <p className="k-sub">{result.headline.sub}</p>
           </div>
+
+          <RegistryPanel r={result.registry} big />
 
           {result.hits.length > 0 && (
             <div className="k-list">
@@ -122,18 +135,18 @@ export function QuickScreen() {
 
           {result.past.length > 0 && (
             <div className="k-list border-shu">
-              <div className="k-list-title text-shu">前にも出てきた相手です</div>
-              <ul>
-                {result.past.map((m, i) => (
-                  <li key={i}>
-                    {m.otherField}「{m.otherValue}」が、
-                    <Link className="link" to={`/case/${m.caseId}/sheet`}>
-                      {m.caseName}
-                    </Link>
-                    （{formatDate(m.caseDate)}）と同じ
-                  </li>
+              <div className="k-list-title text-shu">前に調べた記録があります</div>
+              <div className="flex flex-col gap-2 pt-1">
+                {result.past.map((p) => (
+                  <Link key={p.caseId} to={`/case/${p.caseId}/${p.confirmed ? 'sheet' : 'check'}`} className="flex flex-wrap items-center gap-2 border border-rule bg-paper-3 px-3 py-2 no-underline">
+                    <VerdictBadge v={p.overall} size="lg" />
+                    <span className="font-bold text-ink">{p.caseName}</span>
+                    <span className="text-base text-ink-2">
+                      {formatDate(p.caseDate)}・{p.decided}項目を調べた・同じもの：{p.matches.slice(0, 2).join('、')}
+                    </span>
+                  </Link>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 

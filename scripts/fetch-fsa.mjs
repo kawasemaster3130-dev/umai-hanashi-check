@@ -20,15 +20,49 @@ async function load(url) {
 
 const clean = (v) => String(v ?? '').replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
 
-function rowsFromXlsx(buf) {
+/** 一覧のExcelを「登録番号・名前・住所・電話・業務の種別」に読み分ける。列の位置は見出しの行から決める */
+function entriesFromXlsx(buf) {
   const wb = XLSX.read(buf, { type: 'buffer' });
   const out = [];
-  for (const name of wb.SheetNames) {
-    const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: false, defval: '' });
-    for (const r of rows) {
-      const cells = r.map(clean).filter(Boolean);
-      if (cells.length >= 3) out.push(cells);
+  for (const sheetName of wb.SheetNames) {
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, raw: false, defval: '' }).map((r) => r.map(clean));
+    const hi = rows.findIndex((r) => r.some((c) => /登録番号/.test(c)) && r.some((c) => /(業者名|商号|名称)/.test(c)));
+    if (hi < 0) continue;
+    const head = rows[hi];
+    const next = rows[hi + 1] ?? [];
+    const sub = next.some((c) => /第\s*[0-9０-９]+\s*号/.test(c)) ? [] : next; // 見出しが2段のときだけ使う
+    const col = (re) => head.findIndex((c) => re.test(c));
+    const cNo = col(/登録番号/);
+    const cName = col(/(業者名|商号|名称)/);
+    const cCorp = col(/法人番号/);
+    const cAddr = col(/(所在地|住所)/);
+    const cTel = col(/電話/);
+    const cDate = col(/登録年月日/);
+    const known = new Set([cNo, cName, cCorp, cAddr, cTel, cDate, col(/郵便番号/), col(/所管/)]);
+    // 業務の種別の列：見出し（2段のこともある）に名前があり、上のどれでもない列
+    const typeCols = [];
+    const width = Math.max(head.length, sub.length);
+    for (let i = 0; i < width; i += 1) {
+      if (known.has(i)) continue;
+      const label = clean(`${head[i] ?? ''}${sub[i] ? ` ${sub[i]}` : ''}`);
+      if (label && label.length <= 30 && !/(備考|加入協会|取扱|合計|ホームページ|URL)/.test(label)) typeCols.push({ i, label: label.replace(/\s+/g, '') });
     }
+    for (const r of rows.slice(hi + 1)) {
+      const no = r[cNo] ?? '';
+      if (!/第\s*[0-9０-９]+\s*号/.test(no)) continue;
+      const name = r[cName] ?? '';
+      if (!name) continue;
+      out.push({
+        no: no.replace(/\s+/g, ''),
+        name,
+        corp: cCorp >= 0 ? r[cCorp] || undefined : undefined,
+        addr: cAddr >= 0 ? r[cAddr] || undefined : undefined,
+        tel: cTel >= 0 ? r[cTel] || undefined : undefined,
+        date: cDate >= 0 ? r[cDate] || undefined : undefined,
+        types: typeCols.filter((t) => /[○〇◯●✓]/.test(r[t.i] ?? '')).map((t) => t.label),
+      });
+    }
+    console.log(`     シート「${sheetName}」見出し: 番号=${cNo} 名前=${cName} 住所=${cAddr} 電話=${cTel} 種別の列=${typeCols.map((t) => t.label).join('|')}`);
   }
   return out;
 }
@@ -57,7 +91,6 @@ function rowsFromHtml(buf) {
   return { rows: out, links: [...html.matchAll(/href="([^"]+\.(?:html|xlsx|xls|csv))"/gi)].map((m) => m[1]) };
 }
 
-// 見出しの行らしいものを落とす
 const looksHeader = (cells) => cells.every((c) => c.length <= 12) && cells.some((c) => /(商号|名称|登録番号|所在地|業者名|代表者|掲載)/.test(c));
 
 const result = { fetchedAt: new Date().toISOString(), sources: [], registered: [], warned: [] };
@@ -65,27 +98,34 @@ for (const s of cfg.sources) {
   const info = { key: s.key, name: s.name, url: s.url, kind: s.kind, ok: false, count: 0 };
   try {
     const buf = await load(process.env[`FSA_${s.key.toUpperCase()}`] ?? s.url);
-    let rows;
-    if (s.format === 'xlsx') rows = rowsFromXlsx(buf);
-    else {
-      const r = rowsFromHtml(buf);
-      rows = r.rows;
-      info.links = r.links.length;
+    if (s.format === 'xlsx') {
+      const entries = entriesFromXlsx(buf);
+      for (const e of entries) result.registered.push({ s: s.key, ...e });
+      info.count = entries.length;
+      for (const e of entries.slice(0, 3)) console.log('     例:', JSON.stringify(e));
+      const withTypes = entries.filter((e) => e.types.length).length;
+      console.log(`     種別つき ${withTypes} 件／電話つき ${entries.filter((e) => e.tel).length} 件`);
+    } else {
+      const rows = rowsFromHtml(buf).rows.filter((c) => !looksHeader(c));
+      for (const c of rows) result.warned.push({ name: c[0], what: c[1], note: c.length >= 5 ? c[2] : undefined, when: c.length >= 5 ? c[3] : c[2], where: c.length >= 5 ? c[4] : c[3] });
+      info.count = rows.length;
+      for (const r of rows.slice(0, 2)) console.log('     例:', JSON.stringify(r).slice(0, 300));
+      const by = {};
+      for (const r of rows) by[r.length] = (by[r.length] ?? 0) + 1;
+      console.log('     列の数ごとの行数:', JSON.stringify(by));
     }
-    rows = rows.filter((c) => !looksHeader(c));
-    for (const cells of rows) result[s.kind].push({ s: s.key, c: cells.slice(0, 8).map((x) => x.slice(0, 160)) });
-    info.ok = rows.length > 0;
-    info.count = rows.length;
-    console.log(`OK  ${s.key}: ${rows.length} 行`);
-    for (const r of rows.slice(0, 3)) console.log('     例:', JSON.stringify(r.slice(0, 6)));
-    const longest = Math.max(0, ...rows.map((r) => r.length));
-    console.log(`     列の最大数: ${longest}`);
+    info.ok = info.count > 0;
+    console.log(`OK  ${s.key}: ${info.count} 件`);
   } catch (e) {
     info.error = String(e.message ?? e);
     console.log(`NG  ${s.key}: ${info.error}`);
   }
   result.sources.push(info);
 }
+for (const t of cfg.selfTest ?? []) {
+  const hit = result.registered.filter((e) => e.name.replace(/\s/g, '').toLowerCase().includes(t.toLowerCase()));
+  console.log(`確認「${t}」: ${hit.length} 件 ${hit.slice(0, 2).map((e) => JSON.stringify(e)).join(' ')}`);
+}
 mkdirSync(join(root, 'public/data'), { recursive: true });
 writeFileSync(join(root, 'public/data/fsa.json'), JSON.stringify(result));
-console.log(`登録 ${result.registered.length} 行／警告 ${result.warned.length} 行を public/data/fsa.json に書きました`);
+console.log(`登録 ${result.registered.length} 件／警告 ${result.warned.length} 件を public/data/fsa.json に書きました`);

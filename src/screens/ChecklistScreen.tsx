@@ -9,6 +9,9 @@ import { buildSearchLines, googleSearchUrl } from '../logic/search';
 import { Collapsible, CopyButton, CountsBar, ExternalLink, Seal, VerdictBadge } from '../components/ui';
 import { ItemEditor } from '../components/ItemEditor';
 import { LinkList } from '../components/LinkList';
+import { RegistryPanel } from '../components/RegistryPanel';
+import { useRegistry } from '../app/hooks';
+import { lookupRegistry } from '../logic/registry';
 
 export function ChecklistScreen() {
   const v = useCaseCtx();
@@ -24,6 +27,8 @@ export function ChecklistScreen() {
   const [highlight, setHighlight] = useState<string | null>(null);
   const searchLines = useMemo(() => buildSearchLines(c), [c]);
   const cardOnly = ctx.rules.cardOnlyCategories.includes(cat);
+  const registryData = useRegistry();
+  const reg = useMemo(() => lookupRegistry(registryData ?? undefined, { names: [...c.card.companyNames, ...c.previousNames], phones: c.card.companyPhone ? [c.card.companyPhone] : [], text: `${c.rawMessages}\n${c.card.claimedRegistrationNo ?? ''}` }), [registryData, c.card.companyNames, c.previousNames, c.card.companyPhone, c.rawMessages, c.card.claimedRegistrationNo]);
   const prevRed = useRef(counts.red);
   const [stopPanel, setStopPanel] = useState(false);
   useEffect(() => {
@@ -166,6 +171,7 @@ export function ChecklistScreen() {
         </div>
         {guide && <p className="text-sm text-ink-2">{guide.intro}</p>}
         {cardOnly && <div className="note">ここは調べものは要りません。言われたことを思い出して答えるだけです。迷ったら7と9を先に。</div>}
+        {cat >= 1 && cat <= 2 && <RegistryPanel r={reg} />}
         {cat >= 1 && cat <= 3 && <div className="note">「載っていない」は安全の意味ではありません。似た名前・英語名・前の名前でも探します。</div>}
         {c.review.flaggedCategories.includes(cat) && <div className="note">もう一人（別のAI）から、この分類に指摘がありました。ここの全部を見直して「見直し済み」にしてください。</div>}
         {guide && linksForGuide(guide.id).length > 0 && (

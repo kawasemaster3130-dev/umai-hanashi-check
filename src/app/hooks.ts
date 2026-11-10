@@ -5,6 +5,7 @@ import type { AppSettings, Case, ChecklistItem } from '../types';
 import { DEFAULT_SETTINGS } from '../types';
 import { getActiveItems, rules } from '../data/checklist';
 import type { VerdictContext } from '../logic/verdict';
+import type { RegistryData } from '../logic/registry';
 
 export function useSettings(): AppSettings | undefined {
   return useLiveQuery(async () => {
@@ -57,4 +58,26 @@ export function useOnline(): boolean {
     };
   }, []);
   return on;
+}
+
+let registryCache: Promise<RegistryData | null> | undefined;
+/** 金融庁の一覧の写し（公開時と週1回に取り込んだもの）。なければ null */
+export function loadRegistry(): Promise<RegistryData | null> {
+  if (!registryCache) {
+    registryCache = fetch(`${import.meta.env.BASE_URL}data/fsa.json`)
+      .then((r) => (r.ok ? (r.json() as Promise<RegistryData>) : null))
+      .catch(() => null);
+  }
+  return registryCache;
+}
+export function useRegistry(): RegistryData | null | undefined {
+  const [d, setD] = useState<RegistryData | null | undefined>(undefined);
+  useEffect(() => {
+    let alive = true;
+    void loadRegistry().then((x) => alive && setD(x));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return d;
 }

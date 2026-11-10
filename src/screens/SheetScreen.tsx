@@ -15,6 +15,9 @@ export function SheetScreen() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const blockers = useMemo(() => confirmBlockers(c, ctx), [c, ctx]);
+  const unchecked = blockers.filter((b) => b.code === 'unchecked');
+  const others = blockers.filter((b) => b.code !== 'unchecked');
+  const counts = useMemo(() => countVerdicts(items, c.items), [items, c.items]);
   const latest = c.snapshots.at(-1);
   const changedSince = latest ? c.updatedAt > latest.confirmedAt : false;
   const draftHtml = useMemo(() => renderSheetHtml(buildSheetData(c, ctx, { evidenceFileName: zipFileName(c) })), [c, ctx]);
@@ -24,7 +27,6 @@ export function SheetScreen() {
     if (blockers.length) return;
     const confirmedAt = nowIso();
     const version = (latest?.version ?? 0) + 1;
-    const counts = countVerdicts(items, c.items);
     const html = renderSheetHtml(buildSheetData(c, ctx, { version, confirmedAt, evidenceFileName: zipFileName(c, confirmedAt) }));
     update((d) => {
       d.snapshots.push({ version, confirmedAt, counts, overall: overallVerdict(counts), html });
@@ -58,28 +60,40 @@ export function SheetScreen() {
           <TextInput value={c.investigator} onChange={(v) => update((d) => void (d.investigator = v))} placeholder="名前や呼び名" />
         </label>
         {blockers.length > 0 ? (
-          <div className="note-danger space-y-2">
-            <div className="font-bold">確定するには、次の {blockers.length} 件を済ませてください（押すとその項目に飛びます）</div>
-            <ul className="list-disc space-y-1 pl-5 text-sm">
-              {blockers.slice(0, 40).map((b, i) => (
-                <li key={i}>
-                  {b.itemId ? (
-                    <Link className="link" to={`/case/${c.id}/check?cat=${items.find((x) => x.id === b.itemId)?.cat ?? 1}#item-${b.itemId}`}>
-                      {b.message}
-                    </Link>
-                  ) : b.code === 'review_pending' || b.code === 'skip_needs_reason' ? (
-                    <Link className="link" to={`/case/${c.id}/review`}>
-                      {b.message}
-                    </Link>
-                  ) : (
-                    <Link className="link" to={`/case/${c.id}/check`}>
-                      {b.message}
-                    </Link>
+          <div className="note-danger space-y-3">
+            <div className="mincho text-lg font-extrabold">まだ結果を確定できません</div>
+            {unchecked.length > 0 && (
+              <div className="space-y-2">
+                <div>
+                  まだ答えていない質問が <b>{unchecked.length}</b> あります。{counts.red >= 1 ? '赤が出ているので、ここで打ち切ることもできます。' : ''}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Link className="btn-primary" to={`/case/${c.id}/check?cat=${items.find((x) => x.id === unchecked[0].itemId)?.cat ?? 1}#item-${unchecked[0].itemId}`}>
+                    続きの質問に答える
+                  </Link>
+                  {counts.red >= 1 && !c.stoppedEarly && (
+                    <button type="button" className="btn-danger" onClick={() => update((d) => void (d.stoppedEarly = true))}>
+                      赤で打ち切る
+                    </button>
                   )}
-                </li>
-              ))}
-              {blockers.length > 40 && <li>ほか {blockers.length - 40} 件</li>}
-            </ul>
+                </div>
+              </div>
+            )}
+            {others.length > 0 && (
+              <div>
+                <div className="font-bold">ほかに直すところ（{others.length}）。押すとそこへ飛びます</div>
+                <ul className="list-disc space-y-1 pl-5 text-sm">
+                  {others.slice(0, 20).map((b, i) => (
+                    <li key={i}>
+                      <Link className="link" to={b.itemId ? `/case/${c.id}/check?cat=${items.find((x) => x.id === b.itemId)?.cat ?? 1}#item-${b.itemId}` : b.code === 'review_pending' || b.code === 'skip_needs_reason' ? `/case/${c.id}/review` : `/case/${c.id}/check`}>
+                        {b.message}
+                      </Link>
+                    </li>
+                  ))}
+                  {others.length > 20 && <li>ほか {others.length - 20} 件</li>}
+                </ul>
+              </div>
+            )}
           </div>
         ) : (
           <div className="note-info">確定できる条件をすべて満たしています。{latest && !changedSince ? `第${latest.version}版（${formatDateTime(latest.confirmedAt)}）として確定済みです。` : latest && changedSince ? `第${latest.version}版のあとに変更があります。確定すると第${latest.version + 1}版になります。` : ''}</div>

@@ -32,9 +32,10 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,md,woff2}'],
-        globIgnores: ['ocr/**'],
+        globIgnores: ['ocr/**', 'data/**'],
         navigateFallback: `${base}index.html`,
         runtimeCaching: [
+          { urlPattern: /\/data\/.*\.json/i, handler: 'NetworkFirst', options: { cacheName: 'registry-data', networkTimeoutSeconds: 5, expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 30 } } },
           { urlPattern: /\/ocr\/.*/i, handler: 'CacheFirst', options: { cacheName: 'ocr-assets', expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
           { urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i, handler: 'StaleWhileRevalidate', options: { cacheName: 'google-fonts-css', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
           { urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i, handler: 'CacheFirst', options: { cacheName: 'google-fonts-files', expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 }, cacheableResponse: { statuses: [0, 200] } } },
