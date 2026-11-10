@@ -139,7 +139,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
       {r.ai && (
         <div className="note-info space-y-1">
           <div className="flex flex-wrap items-center gap-2 font-semibold">
-            AI下調べの結果（{r.provisional ? '仮' : '参考'}）
+            {r.ai.source === 'app' ? 'アプリが金融庁の一覧の写しとくらべた結果' : 'AI下調べの結果'}（{r.provisional ? '仮' : '参考'}）
             <VerdictBadge v={r.ai.verdict} size="sm" />
             <span className="text-xs font-normal">
               {r.ai.status === 'found' ? '載っていた' : r.ai.status === 'not_found' ? '載っていなかった' : r.ai.status === 'could_not_check' ? '調べられなかった' : r.ai.status === 'na' ? '該当なし' : '状態不明'}
@@ -160,7 +160,7 @@ export function ItemEditor({ item, highlight }: { item: ChecklistItem; highlight
               ⚠ {w}
             </div>
           ))}
-          <div className="text-xs">AIの答えに「登録あり」「問題なし」と書いてあっても、そのまま信じません。{item.selfRequired ? '必ず自分で一覧を開いて確かめ、「確認した人：自分」にしてください。' : '下の判定ボタンで自分の判定として確定します。'}</div>
+          <div className="text-xs">{r.ai.source === 'app' ? '写しは古いことがあります。' : 'AIの答えに「登録あり」「問題なし」と書いてあっても、そのまま信じません。'}{item.selfRequired ? '必ず自分で一覧を開いて確かめ、「確認した人：自分」にしてください。' : '下の判定ボタンで自分の判定として確定します。'}</div>
         </div>
       )}
 

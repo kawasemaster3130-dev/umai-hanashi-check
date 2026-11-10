@@ -97,12 +97,29 @@ function rowsFromHtml(buf) {
 
 const looksHeader = (cells) => cells.every((c) => c.length <= 12) && cells.some((c) => /(商号|名称|登録番号|所在地|業者名|代表者|掲載)/.test(c));
 
-const result = { fetchedAt: new Date().toISOString(), sources: [], registered: [], warned: [] };
+async function textFromPdf(buf) {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(buf), useSystemFonts: true, verbosity: 0 }).promise;
+  const parts = [];
+  for (let i = 1; i <= doc.numPages; i += 1) {
+    const page = await doc.getPage(i);
+    const tc = await page.getTextContent();
+    parts.push(tc.items.map((it) => it.str ?? '').join(''));
+  }
+  return parts.join('\n');
+}
+
+const result = { fetchedAt: new Date().toISOString(), sources: [], registered: [], warned: [], pages: [] };
 for (const s of cfg.sources) {
   const info = { key: s.key, name: s.name, url: s.url, kind: s.kind, ok: false, count: 0 };
   try {
     const buf = await load(process.env[`FSA_${s.key.toUpperCase()}`] ?? s.url);
-    if (s.format === 'xlsx') {
+    if (s.kind === 'page') {
+      const text = clean(s.format === 'pdf' ? await textFromPdf(buf) : strip(decodeHtml(buf).replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ')));
+      result.pages.push({ key: s.key, itemId: s.itemId, name: s.name, url: s.url, text: text.slice(0, 600000) });
+      info.count = text.length;
+      console.log(`     文字数 ${text.length}／冒頭: ${text.slice(0, 120)}`);
+    } else if (s.format === 'xlsx') {
       const entries = entriesFromXlsx(buf);
       for (const e of entries) result.registered.push({ s: s.key, ...e });
       info.count = entries.length;
@@ -132,4 +149,4 @@ for (const t of cfg.selfTest ?? []) {
 }
 mkdirSync(join(root, 'public/data'), { recursive: true });
 writeFileSync(join(root, 'public/data/fsa.json'), JSON.stringify(result));
-console.log(`登録 ${result.registered.length} 件／警告 ${result.warned.length} 件を public/data/fsa.json に書きました`);
+console.log(`登録 ${result.registered.length} 件／警告 ${result.warned.length} 件／ページ ${result.pages.length} 枚を public/data/fsa.json に書きました`);

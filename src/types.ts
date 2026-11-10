@@ -108,6 +108,7 @@ export interface AiItemResult {
   naReason?: string;
   warnings: string[];
   importedAt: string;
+  source?: 'app'; // 'app' はアプリが金融庁の一覧の写しと照合した結果（AIではない）
 }
 
 export interface ItemResult {

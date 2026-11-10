@@ -25,6 +25,7 @@ export interface RegistryData {
   sources: { key: string; name: string; url: string; kind: string; ok: boolean; count: number; error?: string }[];
   registered: RegisteredEntry[];
   warned: WarnedEntry[];
+  pages?: { key: string; itemId: string; name: string; url: string; text: string }[]; // 文章に名前が出ているかだけを見るページ
 }
 
 const CORP_WORDS = /(株式会社|合同会社|有限会社|合資会社|合名会社|一般社団法人|一般財団法人|\(株\)|㈱|\(同\)|llc|ltd|limited|inc|corporation|corp|co)/g;

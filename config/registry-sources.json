@@ -1,5 +1,5 @@
 {
-  "note": "アプリに取り込む金融庁の一覧。kind=registered は登録を受けている業者、warned は無登録で警告を受けた者。URLが変わったらここを直す。",
+  "note": "アプリに取り込む金融庁の一覧。kind=registered は登録を受けている業者、warned は無登録で警告を受けた者、page はページの文章に名前が出ているかだけを見るもの（itemId の項目に使う）。URLが変わったらここを直す。",
   "sources": [
     {
       "key": "kinsho",
@@ -21,6 +21,38 @@
       "kind": "warned",
       "format": "html",
       "url": "https://www.fsa.go.jp/ordinary/chuui/mutouroku/04.html"
+    },
+    {
+      "key": "crypto_warn_jp",
+      "name": "暗号資産の無登録業者への警告（国内）",
+      "kind": "page",
+      "format": "pdf",
+      "itemId": "2-2",
+      "url": "https://www.fsa.go.jp/policy/virtual_currency/angoushisan_mutouroku_j.pdf"
+    },
+    {
+      "key": "crypto_warn_os",
+      "name": "暗号資産の無登録業者への警告（海外）",
+      "kind": "page",
+      "format": "pdf",
+      "itemId": "2-2",
+      "url": "https://www.fsa.go.jp/policy/virtual_currency/angoushisan_mutouroku.pdf"
+    },
+    {
+      "key": "sesc_moushitate",
+      "name": "証券取引等監視委員会 裁判所への申立て",
+      "kind": "page",
+      "format": "html",
+      "itemId": "2-3",
+      "url": "https://www.fsa.go.jp/sesc/actions/moushitate.html"
+    },
+    {
+      "key": "tokurei",
+      "name": "適格機関投資家等特例業務届出者（業務廃止命令・連絡が取れない者を含むページ）",
+      "kind": "page",
+      "format": "html",
+      "itemId": "1-5",
+      "url": "https://www.fsa.go.jp/menkyo/menkyoj/tokurei.html"
     }
   ],
   "selfTest": [

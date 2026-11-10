@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCases, useRegistry, useSettings, activeItemsFor } from '../app/hooks';
 import { RegistryPanel } from '../components/RegistryPanel';
+import { OverviewTable } from '../components/OverviewTable';
+import { applyOverviewToCase } from '../logic/overview';
 import { VerdictBadge } from '../components/ui';
 import { saveCase } from '../app/store';
 import { keywords } from '../data/config';
@@ -10,7 +12,7 @@ import { recognizeImages } from '../logic/ocr';
 import { applyAutoHints, computeAutoHints } from '../logic/hints';
 import { nowIso, uuid, ymd, formatDate } from '../logic/util';
 import { countVerdicts } from '../logic/verdict';
-import { CopyButton, Seal } from '../components/ui';
+import { Seal } from '../components/ui';
 
 export function QuickScreen() {
   const cases = useCases();
@@ -43,6 +45,7 @@ export function QuickScreen() {
     const c = { ...r.draft, id: uuid(), createdAt: nowIso(), updatedAt: nowIso() };
     if (!c.card.caseName) c.card.caseName = c.card.companyNames[0] ? `${c.card.companyNames[0]}の話` : `チェック ${ymd()}`;
     applyAutoHints(c, computeAutoHints(c, keywords, items), items);
+    applyOverviewToCase(c, r.overview, items, nowIso());
     if (to === 'kantan') c.kantan = { answers: {} };
     await saveCase(c);
     navigate(to === 'kantan' ? `/kantan/${c.id}?q=1` : `/case/${c.id}/check`);
@@ -150,41 +153,14 @@ export function QuickScreen() {
             </div>
           )}
 
-          {result.actions.length > 0 && (
-            <div className="k-list">
-              <div className="k-list-title">自分の目で見る（ここが一番大事）</div>
-              <div className="flex flex-col gap-3 pt-2">
-                {result.actions.map((a) => (
-                  <div key={a.key}>
-                    <a
-                      className="k-btn"
-                      href={a.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        if (a.copy) void navigator.clipboard?.writeText(a.copy).catch(() => undefined);
-                      }}
-                    >
-                      {a.label}
-                    </a>
-                    <p className="k-sub mt-1 flex flex-wrap items-center gap-2">
-                      {a.how}
-                      {(a.copies ?? []).map((n) => (
-                        <CopyButton key={n} text={n} label={`「${n}」をコピー`} />
-                      ))}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <OverviewTable rows={result.overview} />
 
-          <p className="k-sub">ここまでは「言葉」と「前の記録」から分かることだけです。払う前に、続きで確かめます。</p>
+          <p className="k-sub">残りは、続きで確かめます。自動で分かった分は「仮」として引き継ぎます。</p>
           <button type="button" className="k-btn k-btn-ink" onClick={() => void startCase('kantan')}>
             10問で確かめる（2分）
           </button>
           <button type="button" className="k-btn" onClick={() => void startCase('card')}>
-            くわしく調べる（教材の41項目）
+            41項目を順に答える（記録する）
           </button>
           <Link to="/paid" className="k-btn k-btn-shu">
             もう払ってしまった

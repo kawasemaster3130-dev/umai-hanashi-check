@@ -10,6 +10,7 @@ import { digitsOnly } from './util';
 import { lookupRegistry, type RegistryData, type RegistryLookup } from './registry';
 import { countVerdicts, overallVerdict } from './verdict';
 import type { Overall } from '../types';
+import { buildOverview, type OverviewRow } from './overview';
 
 export interface QuickConfig {
   labels: Record<string, string>;
@@ -56,6 +57,7 @@ export interface QuickResult {
   hits: QuickHit[];
   past: PastRecord[];
   registry: RegistryLookup;
+  overview: OverviewRow[];
   actions: QuickAction[];
   draft: Case; // そのまま案件にできる下書き
 }
@@ -138,7 +140,8 @@ export function quickCheck(input: QuickInput, cases: Case[], keywords: KeywordsC
     if (!url) continue;
     actions.push({ key: a.key, label: a.label, url, copy: a.copy === 'name' ? names[0] : undefined, copies: a.copy === 'name' ? names : undefined, how: a.how });
   }
-  return { level, headline, hasText, hits, past, registry, actions, draft };
+  const overview = buildOverview(items, { names, phones, text: input.text, registry, data: registryData, hints: hintsById });
+  return { level, headline, hasText, hits, past, registry, overview, actions, draft };
 }
 
 function makeHeadline(level: QuickResult['level'], r: RegistryLookup, hasText: boolean): { title: string; sub: string } {
