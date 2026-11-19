@@ -173,6 +173,8 @@ export interface AppSettings {
   consentedAt?: string;
   enabledOptionalItems: string[]; // X-1 など
   investigatorDefault?: string;
+  aiKey?: string; // 口コミ・うわさをAIに調べさせるためのAPIキー（この端末の中だけ）
+  aiModel?: string;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = { enabledOptionalItems: [] };

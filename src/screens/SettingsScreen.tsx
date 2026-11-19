@@ -67,6 +67,18 @@ export function SettingsScreen() {
         </ul>
       </Section>
 
+      <Section title="口コミ・うわさをAIに調べてもらう（試験的・任意）">
+        <p className="text-sm text-ink-2">Claude の APIキーを入れると、結果の画面に「AIに調べてもらう」が出ます。AIがネットを調べ、経歴・口コミ・悪いうわさを、出どころつきでまとめます。キーはこの端末の中だけに保存し、調べる名前は Anthropic のAPIに送られます。料金は、キーの持ち主にかかります。</p>
+        <label className="block">
+          <span className="label">APIキー</span>
+          <input className="input" type="password" autoComplete="off" value={settings?.aiKey ?? ''} placeholder="sk-ant-…" onChange={(e) => void saveSettings({ aiKey: e.target.value.trim() || undefined })} />
+        </label>
+        <label className="block sm:max-w-sm">
+          <span className="label">使うモデル（空なら既定）</span>
+          <input className="input" value={settings?.aiModel ?? ''} placeholder="claude-sonnet-5-5" onChange={(e) => void saveSettings({ aiModel: e.target.value.trim() || undefined })} />
+        </label>
+      </Section>
+
       <Section title="データの書き出し・読み込み・全削除">
         <p className="text-sm text-ink-2">データはこの端末の中（ブラウザの保存領域）だけにあります。機種変更やブラウザのデータ消去に備えて、ZIPで書き出しておいてください。</p>
         <div className="flex flex-wrap gap-2">
