@@ -14,16 +14,30 @@ import { buildTopicCard, detectTopics, topicWordHits, topics, type TopicAnswers 
 import { nowIso, uuid, ymd } from '../logic/util';
 import { OverviewTable } from '../components/OverviewTable';
 import { Seal } from '../components/ui';
+import { Icon, type IconName } from '../components/Icons';
+import { feel } from '../app/feedback';
 
 const TONE_SEAL = { red: 'red', yellow: 'yellow', blue: 'blue', none: 'unchecked' } as const;
 const TONE_WORD = { red: 'あぶない', yellow: '気をつける', blue: '問題なし', none: '—' } as const;
+const TONE_ICON = { red: 'cross', yellow: 'triangle', blue: 'circle', none: 'circle' } as const;
+const CARD_ICON: Record<string, IconName> = { register: 'building', warning: 'flag', doing: 'hand', history: 'clock', topic: 'robot' };
+const TOPIC_ICON: Record<string, IconName> = { ea: 'robot', copy: 'copy', crypto: 'coin' };
 
-function Card({ c }: { c: SimpleCard }) {
+function Card({ c, i = 0 }: { c: SimpleCard; i?: number }) {
+  const icon = c.key === 'topic' ? (c.label.includes('コピー') ? 'copy' : c.label.includes('通貨') ? 'coin' : 'robot') : CARD_ICON[c.key] ?? 'circle';
   return (
-    <section className={`s-card s-${c.tone}`}>
+    <section className={`s-card s-${c.tone} reveal`} style={{ ['--i' as string]: i }}>
       <div className="s-head">
-        <span className="s-label">{c.label}</span>
-        <span className="s-tone">{TONE_WORD[c.tone]}</span>
+        <span className="s-label">
+          <span className="s-ico">
+            <Icon name={icon} size={20} />
+          </span>
+          {c.label}
+        </span>
+        <span className="s-tone">
+          <Icon name={TONE_ICON[c.tone]} size={14} strokeWidth={2.6} />
+          {TONE_WORD[c.tone]}
+        </span>
       </div>
       <h3 className="s-title">{c.headline}</h3>
       {c.lines.map((l, i) => (
@@ -67,6 +81,8 @@ export function QuickScreen() {
   const [ocr, setOcr] = useState<{ busy: boolean; msg: string }>({ busy: false, msg: '' });
   const [emptyMsg, setEmptyMsg] = useState(false);
   const [rumor, setRumor] = useState<{ busy: boolean; report?: RumorReport; error?: string }>({ busy: false });
+  const [checking, setChecking] = useState(false);
+  const [runId, setRunId] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const items = activeItemsFor(settings);
   const [picked, setPicked] = useState<string[]>([]);
@@ -84,8 +100,21 @@ export function QuickScreen() {
     setRumor({ busy: false });
     const found = detectTopics(`${query}\n${text}`);
     if (found.length) setPicked((cur) => Array.from(new Set([...cur, ...found])));
-    setResult(quickCheck({ text, query }, cases ?? [], keywords, items, nowIso(), registry));
-    setTimeout(() => document.getElementById('quick-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    const next = quickCheck({ text, query }, cases ?? [], keywords, items, nowIso(), registry);
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    setChecking(true);
+    navigator.vibrate?.(8);
+    window.setTimeout(
+      () => {
+        setChecking(false);
+        setResult(next);
+        setRunId((n) => n + 1);
+        const o = buildSimpleReport(next, activity).overall;
+        feel(`stamp-${o}`);
+        window.setTimeout(() => document.getElementById('quick-result')?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }), 40);
+      },
+      reduced ? 0 : 720,
+    );
   };
 
   const startCase = async (to: 'kantan' | 'card') => {
@@ -132,18 +161,37 @@ export function QuickScreen() {
 
   return (
     <div className="k-wrap">
-      <h1 className="h1 dai">名前を入れて、しらべる</h1>
-      <label className="block">
-        <span className="sr-only">会社名・商品名・売っている人の名前</span>
-        <input className="input s-input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="会社名・商品名・売っている人の名前" onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && run()} />
-        <span className="mt-1 block text-sm text-ink-3">空白で区切れば、いくつでも。電話番号も入れられます。</span>
-      </label>
+      <div className="hero">
+        <div className="hero-kicker">払う前に、パッとチェック</div>
+        <h1 className="hero-title">
+          <span className="nowrap">その話、</span>
+          <span className="nowrap">だいじょうぶ？</span>
+        </h1>
+      </div>
+      <div className="search-box">
+        <Icon name="search" size={26} className="search-ico" />
+        <label className="sr-only" htmlFor="q">
+          会社名・商品名・売っている人の名前
+        </label>
+        <input id="q" className="search-input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="会社名・商品名・人の名前" enterKeyHint="search" autoComplete="off" onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && run()} />
+        {query && (
+          <button type="button" className="search-clear" aria-label="消す" onClick={() => setQuery('')}>
+            <Icon name="close" size={20} />
+          </button>
+        )}
+      </div>
+      <p className="-mt-2 text-sm text-ink-3">空白で区切れば、いくつでも。電話番号も入れられます。</p>
       <details className="s-more">
-        <summary>言われたこと・スクショも入れる</summary>
+        <summary>
+          <Icon name="camera" size={20} />
+          言われたこと・スクショも入れる
+          {text.trim() && <span className="more-dot" aria-label="入力あり" />}
+        </summary>
         <div className="flex flex-col gap-3 pt-3">
           <textarea className="textarea min-h-32 text-lg" value={text} onChange={(e) => setText(e.target.value)} placeholder="LINEやメールで言われたことを、ここに貼る" />
           <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => void onFiles(Array.from(e.target.files ?? []))} />
           <button type="button" className="k-btn" disabled={ocr.busy} onClick={() => fileRef.current?.click()}>
+            <Icon name="camera" size={26} className="mr-2" />
             {ocr.busy ? ocr.msg : 'スクショから読み取る'}
           </button>
           {!ocr.busy && ocr.msg && <p className="k-sub">{ocr.msg}</p>}
@@ -152,18 +200,39 @@ export function QuickScreen() {
       </details>
 
       <div className="sos-wrap">
-        <button type="button" className="sos-btn" aria-label="チェック" onClick={run}>
-          チェック
+        <button type="button" className={`sos-btn ${checking ? 'is-checking' : ''}`} aria-label="チェック" aria-busy={checking} onClick={run} disabled={checking}>
+          <span className="sos-ring" aria-hidden="true" />
+          {checking ? <span className="sos-checking">照合中</span> : 'チェック'}
         </button>
+        <div className="sos-cap" aria-live="polite">
+          {checking ? '金融庁の一覧とくらべています…' : '押すと、すぐに見ます'}
+        </div>
         {emptyMsg && <p className="note-danger text-lg">名前を入れてから押してください。</p>}
       </div>
 
       {result && report && (
-        <div id="quick-result" className="flex flex-col gap-4 pt-2">
-          <div className={`k-result ${report.overall === 'none' ? '' : `k-result-${report.overall}`}`}>
-            <Seal v={TONE_SEAL[report.overall]} size="xl" />
-            <h2 className="k-q">{report.title}</h2>
-            <p className="k-sub">{report.sub}</p>
+        <div id="quick-result" key={runId} className="flex scroll-mt-20 flex-col gap-4 pt-2">
+          <div className={`verdict verdict-${report.overall}`}>
+            <div className="verdict-stamp">
+              <Seal v={TONE_SEAL[report.overall]} size="xl" />
+              <span className="verdict-splash" aria-hidden="true" />
+            </div>
+            <div className="verdict-body">
+              <div className="verdict-name">{names.length ? names.map((n) => `「${n}」`).join('') : '入れた内容'}の結果</div>
+              <h2 className="verdict-title">{report.title}</h2>
+              <p className="verdict-sub">{report.sub}</p>
+              <div className="verdict-tally">
+                {(['red', 'yellow', 'blue'] as const).map((t) => {
+                  const n = report.cards.filter((c) => c.tone === t).length;
+                  return n ? (
+                    <span key={t} className={`tally tally-${t}`}>
+                      <Icon name={TONE_ICON[t]} size={14} strokeWidth={2.6} />
+                      {TONE_WORD[t]} {n}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            </div>
           </div>
 
           <div className="s-ask">
@@ -190,8 +259,14 @@ export function QuickScreen() {
               {topics.map((t) => {
                 const on = picked.includes(t.id);
                 return (
-                  <button key={t.id} type="button" className={`s-choice ${on ? 's-choice-on' : ''}`} aria-pressed={on} onClick={() => setPicked((cur) => (on ? cur.filter((x) => x !== t.id) : [...cur, t.id]))}>
+                  <button key={t.id} type="button" className={`s-choice s-tile ${on ? 's-choice-on' : ''}`} aria-pressed={on} onClick={() => setPicked((cur) => (on ? cur.filter((x) => x !== t.id) : [...cur, t.id]))}>
+                    <Icon name={TOPIC_ICON[t.id] ?? 'circle'} size={30} strokeWidth={1.6} />
                     {t.label}
+                    {on && (
+                      <span className="tile-check" aria-hidden="true">
+                        <Icon name="check" size={14} strokeWidth={3} />
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -223,13 +298,18 @@ export function QuickScreen() {
             })}
           </div>
 
-          {report.cards.map((c) => (
-            <Card key={c.key + c.label} c={c} />
+          {report.cards.map((c, i) => (
+            <Card key={c.key + c.label} c={c} i={i} />
           ))}
 
-          <section className={`s-card s-${rumor.report?.rumors.some((x) => x.level === 'red') ? 'red' : rumor.report?.rumors.length ? 'yellow' : 'none'}`}>
+          <section style={{ ['--i' as string]: report.cards.length }} className={`reveal s-card s-${rumor.report?.rumors.some((x) => x.level === 'red') ? 'red' : rumor.report?.rumors.length ? 'yellow' : 'none'}`}>
             <div className="s-head">
-              <span className="s-label">口コミ・うわさ</span>
+              <span className="s-label">
+                <span className="s-ico">
+                  <Icon name="talk" size={20} />
+                </span>
+                口コミ・うわさ
+              </span>
             </div>
             {names.length === 0 ? (
               <h3 className="s-title">名前を入れると、ここに出ます</h3>

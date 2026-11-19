@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { installGlobalFeel, setSound } from './app/feedback';
 import { HashRouter, Link, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import { Shell } from './components/Layout';
 import { ConsentModal } from './components/ConsentModal';
@@ -42,6 +44,8 @@ function CaseLayout() {
 
 export default function App() {
   const settings = useSettings();
+  useEffect(() => installGlobalFeel(), []);
+  useEffect(() => setSound(!!settings?.sound), [settings?.sound]);
   return (
     <HashRouter>
       <Shell>

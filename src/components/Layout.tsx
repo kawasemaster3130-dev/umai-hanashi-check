@@ -4,6 +4,14 @@ import { useCaseCtx } from '../app/CaseContext';
 import { caseTitle } from '../logic/crossref';
 import { OverallBadge } from './ui';
 import { useOnline } from '../app/hooks';
+import { Icon, type IconName } from './Icons';
+
+const TABS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
+  { to: '/', label: 'チェック', icon: 'search', end: true },
+  { to: '/cases', label: '記録', icon: 'records' },
+  { to: '/guides', label: '手引き', icon: 'book' },
+  { to: '/settings', label: '設定', icon: 'gear' },
+];
 
 export function Shell({ children }: { children: ReactNode }) {
   const online = useOnline();
@@ -15,24 +23,28 @@ export function Shell({ children }: { children: ReactNode }) {
             <span className="mr-2 hidden border border-paper-2 px-1 align-middle text-[0.65rem] tracking-widest sm:inline-block">点検票</span>
             うまい話チェック
           </NavLink>
-          <nav className="mincho flex shrink-0 items-center gap-0 text-[0.8rem] sm:gap-0.5 sm:text-sm" aria-label="メニュー">
-            <NavLink to="/" className="nav-check whitespace-nowrap">
-              チェック
-            </NavLink>
-            {[
-              ['/cases', '記録'],
-              ['/guides', '手引き'],
-              ['/settings', '設定'],
-            ].map(([to, label]) => (
-              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `whitespace-nowrap px-1 py-1 sm:px-2 ${isActive ? 'bg-paper-2 text-ink font-bold' : 'underline-offset-4 hover:underline'}`}>
-                {label}
+          <nav className="mincho hidden shrink-0 items-center gap-1 text-sm sm:flex" aria-label="メニュー">
+            {TABS.map((t) => (
+              <NavLink key={t.to} to={t.to} end={t.end} className={({ isActive }) => `top-link ${t.to === '/' ? 'top-link-check' : ''} ${isActive ? 'is-on' : ''}`}>
+                <Icon name={t.icon} size={18} />
+                {t.label}
               </NavLink>
             ))}
           </nav>
         </div>
-        {!online && <div className="bg-ocher-bg px-4 py-1 text-center text-xs text-ink">オフラインです。入力・保存・判定の1枚の表示はできます。外のサイトは開けません。</div>}
       </header>
-      <main className="mx-auto w-full max-w-5xl px-4 py-4 pb-24">{children}</main>
+      {!online && <div className="sticky top-[var(--hdr)] z-10 bg-ocher-bg px-4 py-1 text-center text-xs text-ink">オフラインです。入力・保存・判定の1枚の表示はできます。外のサイトは開けません。</div>}
+      <main className="mx-auto w-full max-w-5xl px-4 py-4 pb-32 sm:pb-16">{children}</main>
+      <nav className="tab-bar sm:hidden" aria-label="メニュー">
+        {TABS.map((t) => (
+          <NavLink key={t.to} to={t.to} end={t.end} className={({ isActive }) => `tab-item ${isActive ? 'is-on' : ''}`}>
+            <span className="tab-ico">
+              <Icon name={t.icon} size={24} />
+            </span>
+            <span className="tab-label">{t.label}</span>
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 }

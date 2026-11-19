@@ -67,6 +67,14 @@ export function SettingsScreen() {
         </ul>
       </Section>
 
+      <Section title="手ごたえ">
+        <label className="flex items-center gap-3 text-lg">
+          <input type="checkbox" className="size-6" checked={!!settings?.sound} onChange={(e) => void saveSettings({ sound: e.target.checked })} />
+          ボタンを押したときに、小さな音を出す
+        </label>
+        <p className="text-sm text-ink-2">スマホでは、押すと軽く震えます（端末の設定で「動きを減らす」にしていると震えません）。</p>
+      </Section>
+
       <Section title="口コミ・うわさをAIに調べてもらう（試験的・任意）">
         <p className="text-sm text-ink-2">Claude の APIキーを入れると、結果の画面に「AIに調べてもらう」が出ます。AIがネットを調べ、経歴・口コミ・悪いうわさを、出どころつきでまとめます。キーはこの端末の中だけに保存し、調べる名前は Anthropic のAPIに送られます。料金は、キーの持ち主にかかります。</p>
         <label className="block">

@@ -176,6 +176,7 @@ export interface AppSettings {
   investigatorDefault?: string;
   aiKey?: string; // 口コミ・うわさをAIに調べさせるためのAPIキー（この端末の中だけ）
   aiModel?: string;
+  sound?: boolean; // ボタンの音
 }
 
 export const DEFAULT_SETTINGS: AppSettings = { enabledOptionalItems: [] };
