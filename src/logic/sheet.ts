@@ -4,7 +4,7 @@ import { VERDICT_ICON, VERDICT_LABEL } from '../types';
 import type { VerdictContext } from './verdict';
 import { conclusionSentence, countVerdicts, getResult, overallVerdict, yellowItems } from './verdict';
 import { escapeHtml, formatDate, isBlank } from './util';
-import { eaNotes } from './ea';
+import { topicNotes } from './topics';
 
 export interface SheetRow {
   id: string;
@@ -78,7 +78,7 @@ export function buildSheetData(c: Case, ctx: VerdictContext, opts: SheetOptions 
   const reg = items.find((it) => it.id === ctx.rules.registryItem);
   if (reg && getResult(c.items, reg.id).verdict === 'na') notes.push('登記簿は未確認');
   if (c.review.status === 'skipped') notes.push(`見落としチェックは省略（${c.review.skipReason?.trim() || '理由未記入'}）`);
-  for (const n of eaNotes(c.ea)) notes.push(n);
+  for (const n of topicNotes(c.topics)) notes.push(n);
   const listDate = latestListDate(c, ctx);
   if (listDate) notes.push(`判定は${formatDate(listDate)}時点の一覧による`);
   const prov = items.filter((it) => getResult(c.items, it.id).provisional && getResult(c.items, it.id).verdict !== 'unchecked').length;

@@ -2,6 +2,7 @@
 import type { QuickResult } from './quick';
 import type { RegisteredEntry } from './registry';
 import { SOURCE_LABEL } from './registry';
+import { findRates } from './rates';
 
 export type Tone = 'red' | 'yellow' | 'blue' | 'none';
 /** 相手が何をすると言っているか */
@@ -12,7 +13,7 @@ export interface SimpleLine {
   mark?: 'red' | 'yellow'; // 赤字・黄色マーカー
 }
 export interface SimpleCard {
-  key: 'register' | 'warning' | 'doing' | 'history' | 'ea';
+  key: 'register' | 'warning' | 'doing' | 'history' | 'topic';
   label: string;
   tone: Tone;
   headline: string;
@@ -148,6 +149,14 @@ export function buildSimpleReport(r: QuickResult, activity: Activity, extra: Sim
     doing.lines.push({ text: '「必ずもうかる」「元本保証」「損は補う」と言って勧めるのは、登録のある会社でも禁止されています。' });
     if (!doing.headline || doing.headline.startsWith('名前を')) doing.headline = '禁止されている言い方があります';
   }
+  // 利回りの数字：年にするといくらか
+  for (const rt of findRates(r.draft.rawMessages).slice(0, 3)) {
+    if (rt.tone === 'none') continue;
+    doing.lines.push({ text: `${rt.label}。${rt.tone === 'red' ? 'ふつうの投資ではありえない数字です。' : '世界で一番うまい投資家の成績くらいの数字です。'}`, mark: rt.tone });
+    if (rt.tone === 'red') doing.tone = 'red';
+    else if (doing.tone !== 'red') doing.tone = 'yellow';
+    if (!doing.headline || doing.headline.startsWith('名前を')) doing.headline = '増える数字が高すぎます';
+  }
   for (const h of r.hits.filter((x) => x.itemId !== '7-3').slice(0, 4)) doing.lines.push({ text: `${h.label}：「${h.quotes[0]}」`, mark: h.suggest });
   if (doing.tone !== 'red' && r.hits.some((h) => h.suggest === 'red')) doing.tone = 'red';
   else if (doing.tone === 'blue' && r.hits.length) doing.tone = 'yellow';
@@ -164,7 +173,7 @@ export function buildSimpleReport(r: QuickResult, activity: Activity, extra: Sim
   hist.headline = hist.lines.length ? '国の記録から分かること' : '国の記録には、まだ何もありません';
   hist.tone = reg.warned.length ? 'red' : 'none';
   cards.push(hist);
-  // EAの話のときの追加のカードは「やっていること」のすぐ下に入れる
+  // 話の種類（EA・コピートレード・仮想通貨）のカードは「やっていること」のすぐ下に入れる
   if (extra.length) cards.splice(cards.findIndex((c) => c.key === 'doing') + 1, 0, ...extra);
 
   const overall: Tone = cards.some((c) => c.tone === 'red') ? 'red' : cards.some((c) => c.tone === 'yellow') ? 'yellow' : first ? 'blue' : 'none';

@@ -248,3 +248,7 @@ mark.mk-yellow { background: linear-gradient(transparent 45%, #ffe45c 45%); colo
 .s-eaq-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
 .s-choice-sm { min-height: 3.2rem; font-size: 1.05rem; box-shadow: 2px 2px 0 0 var(--color-ink); }
 .s-choice-sm.s-choice-on { transform: translate(2px, 2px); }
+
+.s-topic { margin-top: 1rem; border-top: 3px double var(--color-ink); padding-top: 0.6rem; }
+.s-topic-t { font-family: var(--font-mincho); font-weight: 800; font-size: 1.2rem; color: var(--color-shu); }
+.s-topic .s-eaq:first-of-type { border-top: 0; margin-top: 0.2rem; padding-top: 0.2rem; }

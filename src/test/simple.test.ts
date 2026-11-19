@@ -86,38 +86,64 @@ describe('口コミ・うわさ', () => {
   });
 });
 
-import { buildEaCard, eaConfig, eaNotes, eaWordHits, looksLikeEa } from '../logic/ea';
+import { buildTopicCard, detectTopics, topicNotes, topicWordHits, topics } from '../logic/topics';
+import { findRates, rateTone } from '../logic/rates';
+import topicsJson from '../../config/topics.json';
 
-describe('EA（自動売買）の4つの見分け', () => {
-  it('質問は4つ：値段・IB・ナンピンマーチン・最初のお金', () => {
-    expect(eaConfig.questions.map((q) => q.id)).toEqual(['price', 'ib', 'martin', 'deposit']);
+const T = (id: string) => topics.find((t) => t.id === id)!;
+
+describe('話の種類ごとの見分け（EA・コピートレード・仮想通貨）', () => {
+  it('3つの種類があり、EAは値段・IB・ナンピンマーチン・最初のお金を聞く', () => {
+    expect(topics.map((t) => t.id)).toEqual(['ea', 'copy', 'crypto']);
+    expect(T('ea').questions.map((q) => q.id)).toEqual(['price', 'ib', 'martin', 'deposit']);
+    expect(T('copy').questions.map((q) => q.id)).toEqual(['ib', 'proof', 'fee', 'control', 'martin', 'deposit']);
+    expect(T('crypto').questions.map((q) => q.id)).toEqual(['rate', 'exchange', 'send', 'newcoin', 'fee']);
   });
-  it('EAの話かどうかを言葉から見つける', () => {
-    expect(looksLikeEa('このＥＡは勝率90%')).toBe(true);
-    expect(looksLikeEa('自動売買で増やします')).toBe(true);
-    expect(looksLikeEa('不動産の話です')).toBe(false);
+  it('言葉から種類を見つける', () => {
+    expect(detectTopics('このＥＡは勝率90%')).toEqual(['ea']);
+    expect(detectTopics('コピトレで月利10%')).toEqual(['copy']);
+    expect(detectTopics('USDTをウォレットに送ってください')).toEqual(['crypto']);
+    expect(detectTopics('EAとコピートレードとビットコイン')).toEqual(['ea', 'copy', 'crypto']);
+    expect(detectTopics('不動産の話です。IDEAがあります')).toEqual([]);
   });
-  it('高いEA・IB・ナンピンマーチン・10万円より多い → 赤4つ', () => {
-    const c = buildEaCard({ price: 'high', ib: 'yes', martin: 'yes', deposit: 'no' }, false);
+  it('EA：高い・IB・ナンピンマーチン・10万円より多い → 赤4つ', () => {
+    const a = { price: 'high', ib: 'yes', martin: 'yes', deposit: 'no' };
+    const c = buildTopicCard(T('ea'), a, false);
     expect(c.tone).toBe('red');
     expect(c.headline).toBe('あぶない点が4つあります');
-    expect(c.lines.filter((l) => l.mark === 'red')).toHaveLength(4);
     expect(c.lines.at(-1)?.text).toContain('登録は見つかっていません');
-    expect(eaNotes({ price: 'high', ib: 'yes', martin: 'yes', deposit: 'no' })).toHaveLength(4);
+    expect(topicNotes({ ea: a })).toHaveLength(4);
+    expect(buildTopicCard(T('ea'), { price: 'low', ib: 'no', martin: 'no', deposit: 'yes' }, true).tone).toBe('blue');
+    expect(buildTopicCard(T('ea'), { price: 'free' }, true).tone).toBe('yellow');
   });
-  it('安い・IBなし・ナンピンでない・10万円以内 → 問題なし。無料は黄', () => {
-    expect(buildEaCard({ price: 'low', ib: 'no', martin: 'no', deposit: 'yes' }, true).tone).toBe('blue');
-    expect(buildEaCard({ price: 'free' }, true).tone).toBe('yellow');
-    expect(buildEaCard({}, true).headline).toContain('答えると');
+  it('コピートレード：成績が画像だけ・相手がお金を動かす → 赤', () => {
+    const c = buildTopicCard(T('copy'), { proof: 'no', control: 'yes', fee: 'low' }, true);
+    expect(c.tone).toBe('red');
+    expect(c.headline).toBe('あぶない点が2つあります');
+    expect(c.lines.at(-1)?.text).toContain('投資運用業');
+  });
+  it('仮想通貨：月に10%以上は赤、年に20%以上は黄', () => {
+    expect(buildTopicCard(T('crypto'), { rate: 'm10' }, false).tone).toBe('red');
+    expect(buildTopicCard(T('crypto'), { rate: 'y20' }, true).tone).toBe('yellow');
+    expect(buildTopicCard(T('crypto'), { rate: 'low', exchange: 'yes', send: 'no', newcoin: 'no', fee: 'no' }, true).tone).toBe('blue');
+    expect(buildTopicCard(T('crypto'), { send: 'yes', newcoin: 'yes', fee: 'yes', exchange: 'no' }, false).headline).toBe('あぶない点が4つあります');
   });
   it('貼った文章から、質問に関係する言葉を拾う', () => {
-    const h = eaWordHits('このリンクから口座開設してください。ナンピンで取り返します。最低入金は30万円から。');
+    const h = topicWordHits(T('ea'), 'このリンクから口座開設してください。ナンピンで取り返します。最低入金は30万円から。');
     expect(Object.keys(h).sort()).toEqual(['deposit', 'ib', 'martin', 'price']);
   });
+  it('利回りの数字：月利10%は赤、年利20%は黄、月利1%は線の下。年にした数字を出す', () => {
+    const r = findRates('月利10%です。年利20％。日利1%。月利1%。APY 300%');
+    expect(r.map((x) => [x.annual, x.tone])).toEqual([[120, 'red'], [20, 'yellow'], [365, 'red'], [12, 'none'], [300, 'red']]);
+    expect(r[0].label).toBe('月に10%（年にすると約120%）');
+    expect(rateTone(19)).toBe('none');
+    const rep2 = buildSimpleReport(quickCheck({ text: 'ステーキングで年利25%', query: '株式会社チャートマスター' }, [], keywords, items, NOW, data), 'advise');
+    expect(rep2.cards.find((c) => c.key === 'doing')!.lines.some((l) => l.text.includes('年に25%') && l.mark === 'yellow')).toBe(true);
+  });
   it('結果に入れると全体が赤になり、決めつける言葉はない', () => {
-    const r = buildSimpleReport(quickCheck({ text: '', query: '株式会社チャートマスター' }, [], keywords, items, NOW, data), 'advise', [buildEaCard({ martin: 'yes' }, true)]);
+    const r = buildSimpleReport(quickCheck({ text: '', query: '株式会社チャートマスター' }, [], keywords, items, NOW, data), 'advise', [buildTopicCard(T('ea'), { martin: 'yes' }, true)]);
     expect(r.overall).toBe('red');
-    expect(r.cards.map((c) => c.key)).toEqual(['register', 'warning', 'doing', 'ea', 'history']);
-    expect(findForbidden(JSON.stringify(eaConfig))).toEqual([]);
+    expect(r.cards.map((c) => c.key)).toEqual(['register', 'warning', 'doing', 'topic', 'history']);
+    expect(findForbidden(JSON.stringify(topicsJson))).toEqual([]);
   });
 });
