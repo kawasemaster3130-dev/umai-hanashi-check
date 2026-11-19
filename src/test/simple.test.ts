@@ -93,10 +93,10 @@ import topicsJson from '../../config/topics.json';
 const T = (id: string) => topics.find((t) => t.id === id)!;
 
 describe('話の種類ごとの見分け（EA・コピートレード・仮想通貨）', () => {
-  it('3つの種類があり、EAは値段・IB・ナンピンマーチン・最初のお金を聞く', () => {
+  it('3つの種類があり、EAは値段・IB・リアル口座・塩漬け・ナンピンマーチン・最初のお金を聞く', () => {
     expect(topics.map((t) => t.id)).toEqual(['ea', 'copy', 'crypto']);
-    expect(T('ea').questions.map((q) => q.id)).toEqual(['price', 'ib', 'martin', 'deposit']);
-    expect(T('copy').questions.map((q) => q.id)).toEqual(['ib', 'proof', 'fee', 'control', 'martin', 'deposit']);
+    expect(T('ea').questions.map((q) => q.id)).toEqual(['price', 'ib', 'real', 'open', 'martin', 'deposit']);
+    expect(T('copy').questions.map((q) => q.id)).toEqual(['ib', 'proof', 'fee', 'control', 'real', 'open', 'martin', 'deposit']);
     expect(T('crypto').questions.map((q) => q.id)).toEqual(['rate', 'exchange', 'send', 'newcoin', 'fee']);
   });
   it('言葉から種類を見つける', () => {
@@ -122,8 +122,15 @@ describe('話の種類ごとの見分け（EA・コピートレード・仮想�
     expect(c.headline).toBe('あぶない点が2つあります');
     expect(c.lines.at(-1)?.text).toContain('投資運用業');
   });
-  it('仮想通貨：月に10%以上は赤、年に20%以上は黄', () => {
-    expect(buildTopicCard(T('crypto'), { rate: 'm10' }, false).tone).toBe('red');
+  it('リアル口座の成績がない・塩漬けが残っている → 赤', () => {
+    const c = buildTopicCard(T('ea'), { real: 'no', open: 'has' }, true);
+    expect(c.headline).toBe('あぶない点が2つあります');
+    expect(c.lines[1].text).toContain('有効証拠金');
+    expect(buildTopicCard(T('copy'), { real: 'yes', open: 'none' }, true).tone).toBe('blue');
+    expect(buildTopicCard(T('copy'), { open: 'unknown' }, true).tone).toBe('yellow');
+  });
+  it('仮想通貨：月に3%以上は赤、年に20%以上は黄', () => {
+    expect(buildTopicCard(T('crypto'), { rate: 'm3' }, false).tone).toBe('red');
     expect(buildTopicCard(T('crypto'), { rate: 'y20' }, true).tone).toBe('yellow');
     expect(buildTopicCard(T('crypto'), { rate: 'low', exchange: 'yes', send: 'no', newcoin: 'no', fee: 'no' }, true).tone).toBe('blue');
     expect(buildTopicCard(T('crypto'), { send: 'yes', newcoin: 'yes', fee: 'yes', exchange: 'no' }, false).headline).toBe('あぶない点が4つあります');
@@ -132,11 +139,14 @@ describe('話の種類ごとの見分け（EA・コピートレード・仮想�
     const h = topicWordHits(T('ea'), 'このリンクから口座開設してください。ナンピンで取り返します。最低入金は30万円から。');
     expect(Object.keys(h).sort()).toEqual(['deposit', 'ib', 'martin', 'price']);
   });
-  it('利回りの数字：月利10%は赤、年利20%は黄、月利1%は線の下。年にした数字を出す', () => {
+  it('利回りの数字：月利3%以上は赤、年利20%は黄、月利1%は線の下。年にした数字を出す', () => {
     const r = findRates('月利10%です。年利20％。日利1%。月利1%。APY 300%');
     expect(r.map((x) => [x.annual, x.tone])).toEqual([[120, 'red'], [20, 'yellow'], [365, 'red'], [12, 'none'], [300, 'red']]);
     expect(r[0].label).toBe('月に10%（年にすると約120%）');
     expect(rateTone(19)).toBe('none');
+    expect(findRates('月利3%')[0].tone).toBe('red');
+    expect(findRates('月利2.9%')[0].tone).toBe('yellow');
+    expect(findRates('月利1.5%')[0].tone).toBe('none');
     const rep2 = buildSimpleReport(quickCheck({ text: 'ステーキングで年利25%', query: '株式会社チャートマスター' }, [], keywords, items, NOW, data), 'advise');
     expect(rep2.cards.find((c) => c.key === 'doing')!.lines.some((l) => l.text.includes('年に25%') && l.mark === 'yellow')).toBe(true);
   });
