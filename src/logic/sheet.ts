@@ -126,7 +126,6 @@ const COLORS: Record<Overall, { fg: string; bg: string }> = {
 };
 
 export const SHEET_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;700;800&family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; color: #23211f; }
   body { font-family: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", Meiryo, sans-serif; font-size: 12.5px; line-height: 1.45; }

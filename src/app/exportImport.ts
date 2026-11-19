@@ -132,6 +132,16 @@ function isCase(v: unknown): v is Case {
   return !!v && typeof v === 'object' && typeof (v as Case).id === 'string' && typeof (v as Case).items === 'object' && !!(v as Case).card;
 }
 
+/** HTMLの中のプログラム（script・イベント・javascript:）を取りのぞく */
+export function stripActiveHtml(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
+    .replace(/<\/?(script|iframe|object|embed|link|meta|base|form)\b[^>]*>/gi, '')
+    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/javascript:/gi, '');
+}
+const okUrl = (u: unknown): u is string => typeof u === 'string' && /^https?:\/\//i.test(u.trim());
+
 /** 古い形や欠けている欄を埋める */
 export function normalizeCase(raw: Case): Case {
   const rawCard = (raw.card ?? {}) as Partial<CaseCard>;
@@ -154,8 +164,10 @@ export function normalizeCase(raw: Case): Case {
   if (!c.card.payee.cryptoAddresses) c.card.payee.cryptoAddresses = [];
   for (const [id, r] of Object.entries(c.items)) {
     const rr = r as Partial<ItemResult>;
-    c.items[id] = { ...rr, verdict: rr.verdict ?? 'unchecked', provisional: !!rr.provisional, urls: rr.urls ?? [], screenshots: rr.screenshots ?? [], quotes: rr.quotes ?? [] };
+    c.items[id] = { ...rr, verdict: rr.verdict ?? 'unchecked', provisional: !!rr.provisional, urls: (rr.urls ?? []).filter((u) => okUrl(u?.url)), screenshots: rr.screenshots ?? [], quotes: rr.quotes ?? [] };
+    if (c.items[id].ai) c.items[id].ai = { ...c.items[id].ai!, urls: (c.items[id].ai!.urls ?? []).filter(okUrl) };
   }
+  c.snapshots = c.snapshots.map((sn) => ({ ...sn, html: stripActiveHtml(String(sn.html ?? '')) }));
   if (c.alreadyPaid) c.alreadyPaid = { ...c.alreadyPaid, consulted: c.alreadyPaid.consulted ?? [], screenshots: c.alreadyPaid.screenshots ?? [] };
   return c;
 }

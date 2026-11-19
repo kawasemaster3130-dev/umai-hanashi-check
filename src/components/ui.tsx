@@ -175,7 +175,13 @@ export function ListInput({ values, onChange, placeholder, addLabel = '追加' }
   );
 }
 
+/** 開いてよいリンクか（http・https だけ。javascript: などは開かない） */
+export function safeUrl(href: string): string | undefined {
+  return /^https?:\/\//i.test(href.trim()) ? href.trim() : undefined;
+}
+
 export function ExternalLink({ href, children, className = 'link' }: { href: string; children: ReactNode; className?: string }) {
+  if (!safeUrl(href)) return <span className="break-all text-ink-3">{children}</span>;
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
       {children}

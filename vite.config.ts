@@ -6,9 +6,32 @@ import { VitePWA } from 'vite-plugin-pwa';
 // GitHub Pages などサブパスに置くときは BASE_PATH=/リポジトリ名/ を付けてビルドする（.github/workflows/deploy.yml が自動で付ける）
 const base = process.env.BASE_PATH ?? '/';
 
+// 通信してよい相手を決める（自分のサイトと、AIを使うときのAnthropicだけ）。本番ビルドにだけ入れる
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval' blob:",
+  "worker-src 'self' blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",
+  "img-src 'self' blob: data:",
+  "connect-src 'self' data: blob: https://api.anthropic.com",
+  "frame-src 'self' blob: data:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ');
+const cspPlugin = {
+  name: 'inject-csp',
+  apply: 'build' as const,
+  transformIndexHtml(html: string) {
+    return html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${CSP}" />\n    <meta name="referrer" content="no-referrer" />`);
+  },
+};
+
 export default defineConfig({
   base,
   plugins: [
+    cspPlugin,
     react(),
     tailwindcss(),
     VitePWA({
@@ -31,14 +54,13 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,md,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,md}'],
         globIgnores: ['ocr/**', 'data/**'],
         navigateFallback: `${base}index.html`,
         runtimeCaching: [
           { urlPattern: /\/data\/.*\.json/i, handler: 'NetworkFirst', options: { cacheName: 'registry-data', networkTimeoutSeconds: 5, expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 30 } } },
           { urlPattern: /\/ocr\/.*/i, handler: 'CacheFirst', options: { cacheName: 'ocr-assets', expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
-          { urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i, handler: 'StaleWhileRevalidate', options: { cacheName: 'google-fonts-css', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
-          { urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i, handler: 'CacheFirst', options: { cacheName: 'google-fonts-files', expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 }, cacheableResponse: { statuses: [0, 200] } } },
+          { urlPattern: /\.woff2?$/i, handler: 'CacheFirst', options: { cacheName: 'fonts', expiration: { maxEntries: 400, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
         ],
       },
     }),

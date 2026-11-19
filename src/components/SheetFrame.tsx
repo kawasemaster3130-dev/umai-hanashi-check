@@ -19,7 +19,7 @@ export function SheetFrame({ html, title = '判定の1枚' }: { html: string; ti
           印刷・PDFで保存
         </button>
       </div>
-      <iframe ref={ref} title={title} srcDoc={html} className="w-full border border-ink bg-paper-2" style={{ height: h }} onLoad={measure} />
+      <iframe ref={ref} title={title} srcDoc={html} sandbox="allow-same-origin allow-modals" className="w-full border border-ink bg-paper-2" style={{ height: h }} onLoad={measure} />
     </div>
   );
 }

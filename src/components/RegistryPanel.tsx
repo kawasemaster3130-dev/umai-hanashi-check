@@ -67,7 +67,7 @@ export function RegistryPanel({ r, big }: { r: RegistryLookup; big?: boolean }) 
         </div>
       )}
       <div className="text-xs text-ink-3">
-        金融庁の一覧を{r.fetchedAt ? formatDate(r.fetchedAt) : ''}に取り込んだ写しとくらべています（週に1回取り直します）。参考です。最後は下のボタンで本物の一覧を見てください。
+        金融庁の一覧を{r.fetchedAt ? formatDate(r.fetchedAt) : ''}に取り込んだ写しとくらべています（週に1回取り直します）。参考です。最後は本物の一覧を見てください。出典：金融庁ウェブサイトの公表資料を加工して作成。
       </div>
     </div>
   );
