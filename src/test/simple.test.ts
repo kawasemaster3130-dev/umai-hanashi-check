@@ -85,3 +85,39 @@ describe('口コミ・うわさ', () => {
     expect(rumorSearchLinks(['A社'])).toHaveLength(3);
   });
 });
+
+import { buildEaCard, eaConfig, eaNotes, eaWordHits, looksLikeEa } from '../logic/ea';
+
+describe('EA（自動売買）の4つの見分け', () => {
+  it('質問は4つ：値段・IB・ナンピンマーチン・最初のお金', () => {
+    expect(eaConfig.questions.map((q) => q.id)).toEqual(['price', 'ib', 'martin', 'deposit']);
+  });
+  it('EAの話かどうかを言葉から見つける', () => {
+    expect(looksLikeEa('このＥＡは勝率90%')).toBe(true);
+    expect(looksLikeEa('自動売買で増やします')).toBe(true);
+    expect(looksLikeEa('不動産の話です')).toBe(false);
+  });
+  it('高いEA・IB・ナンピンマーチン・10万円より多い → 赤4つ', () => {
+    const c = buildEaCard({ price: 'high', ib: 'yes', martin: 'yes', deposit: 'no' }, false);
+    expect(c.tone).toBe('red');
+    expect(c.headline).toBe('あぶない点が4つあります');
+    expect(c.lines.filter((l) => l.mark === 'red')).toHaveLength(4);
+    expect(c.lines.at(-1)?.text).toContain('登録は見つかっていません');
+    expect(eaNotes({ price: 'high', ib: 'yes', martin: 'yes', deposit: 'no' })).toHaveLength(4);
+  });
+  it('安い・IBなし・ナンピンでない・10万円以内 → 問題なし。無料は黄', () => {
+    expect(buildEaCard({ price: 'low', ib: 'no', martin: 'no', deposit: 'yes' }, true).tone).toBe('blue');
+    expect(buildEaCard({ price: 'free' }, true).tone).toBe('yellow');
+    expect(buildEaCard({}, true).headline).toContain('答えると');
+  });
+  it('貼った文章から、質問に関係する言葉を拾う', () => {
+    const h = eaWordHits('このリンクから口座開設してください。ナンピンで取り返します。最低入金は30万円から。');
+    expect(Object.keys(h).sort()).toEqual(['deposit', 'ib', 'martin', 'price']);
+  });
+  it('結果に入れると全体が赤になり、決めつける言葉はない', () => {
+    const r = buildSimpleReport(quickCheck({ text: '', query: '株式会社チャートマスター' }, [], keywords, items, NOW, data), 'advise', [buildEaCard({ martin: 'yes' }, true)]);
+    expect(r.overall).toBe('red');
+    expect(r.cards.map((c) => c.key)).toEqual(['register', 'warning', 'doing', 'ea', 'history']);
+    expect(findForbidden(JSON.stringify(eaConfig))).toEqual([]);
+  });
+});

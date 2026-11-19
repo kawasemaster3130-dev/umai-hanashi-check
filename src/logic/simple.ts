@@ -12,7 +12,7 @@ export interface SimpleLine {
   mark?: 'red' | 'yellow'; // 赤字・黄色マーカー
 }
 export interface SimpleCard {
-  key: 'register' | 'warning' | 'doing' | 'history';
+  key: 'register' | 'warning' | 'doing' | 'history' | 'ea';
   label: string;
   tone: Tone;
   headline: string;
@@ -49,7 +49,7 @@ function jobs(e: RegisteredEntry): string {
   return e.types.length ? e.types.join('・') : '（種類の記載なし）';
 }
 
-export function buildSimpleReport(r: QuickResult, activity: Activity): SimpleReport {
+export function buildSimpleReport(r: QuickResult, activity: Activity, extra: SimpleCard[] = []): SimpleReport {
   const reg = r.registry;
   const has = reg.available;
   const names = reg.names;
@@ -164,6 +164,8 @@ export function buildSimpleReport(r: QuickResult, activity: Activity): SimpleRep
   hist.headline = hist.lines.length ? '国の記録から分かること' : '国の記録には、まだ何もありません';
   hist.tone = reg.warned.length ? 'red' : 'none';
   cards.push(hist);
+  // EAの話のときの追加のカードは「やっていること」のすぐ下に入れる
+  if (extra.length) cards.splice(cards.findIndex((c) => c.key === 'doing') + 1, 0, ...extra);
 
   const overall: Tone = cards.some((c) => c.tone === 'red') ? 'red' : cards.some((c) => c.tone === 'yellow') ? 'yellow' : first ? 'blue' : 'none';
   const title = overall === 'red' ? 'あぶない点があります' : overall === 'yellow' ? '気をつける点があります' : overall === 'blue' ? '国の記録では、問題は見つかりませんでした' : '名前だけでは分かりませんでした';

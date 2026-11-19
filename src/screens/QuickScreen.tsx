@@ -10,6 +10,7 @@ import { applyOverviewToCase } from '../logic/overview';
 import { buildSimpleReport, type Activity, type SimpleCard } from '../logic/simple';
 import { fetchRumorReport, rumorSearchLinks, RUMOR_MODEL_DEFAULT, type RumorItem, type RumorReport } from '../logic/rumor';
 import { countVerdicts } from '../logic/verdict';
+import { buildEaCard, eaConfig, eaWordHits, looksLikeEa, type EaAnswers } from '../logic/ea';
 import { nowIso, uuid, ymd } from '../logic/util';
 import { OverviewTable } from '../components/OverviewTable';
 import { Seal } from '../components/ui';
@@ -68,7 +69,10 @@ export function QuickScreen() {
   const [rumor, setRumor] = useState<{ busy: boolean; report?: RumorReport; error?: string }>({ busy: false });
   const fileRef = useRef<HTMLInputElement>(null);
   const items = activeItemsFor(settings);
-  const report = useMemo(() => (result ? buildSimpleReport(result, activity) : null), [result, activity]);
+  const [isEa, setIsEa] = useState(false);
+  const [ea, setEa] = useState<EaAnswers>({});
+  const eaHits = useMemo(() => eaWordHits(text), [text]);
+  const report = useMemo(() => (result ? buildSimpleReport(result, activity, isEa ? [buildEaCard(ea, result.registry.registered.length > 0)] : []) : null), [result, activity, isEa, ea]);
   const names = result?.registry.names ?? [];
 
   const run = () => {
@@ -78,6 +82,7 @@ export function QuickScreen() {
     }
     setEmptyMsg(false);
     setRumor({ busy: false });
+    if (looksLikeEa(`${query}\n${text}`)) setIsEa(true);
     setResult(quickCheck({ text, query }, cases ?? [], keywords, items, nowIso(), registry));
     setTimeout(() => document.getElementById('quick-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
@@ -96,6 +101,7 @@ export function QuickScreen() {
     applyAutoHints(c, computeAutoHints(c, keywords, items), items);
     applyOverviewToCase(c, r.overview, items, nowIso());
     if (to === 'kantan') c.kantan = { answers: {} };
+    if (isEa && Object.keys(ea).length) c.ea = ea;
     await saveCase(c);
     navigate(to === 'kantan' ? `/kantan/${c.id}?q=1` : `/case/${c.id}/check`);
   };
@@ -175,6 +181,36 @@ export function QuickScreen() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="s-ask">
+            <div className="s-ask-q">これは、EA（FXの自動売買ソフト）の話ですか？</div>
+            <div className="s-ask-btns !grid-cols-2">
+              <button type="button" className={`s-choice ${isEa ? 's-choice-on' : ''}`} aria-pressed={isEa} onClick={() => setIsEa(true)}>
+                はい
+              </button>
+              <button type="button" className={`s-choice ${!isEa ? 's-choice-on' : ''}`} aria-pressed={!isEa} onClick={() => setIsEa(false)}>
+                いいえ
+              </button>
+            </div>
+            {isEa &&
+              eaConfig.questions.map((q) => (
+                <div key={q.id} className="s-eaq">
+                  <div className="s-eaq-t">{q.text}</div>
+                  {(eaHits[q.id] ?? []).map((h) => (
+                    <p key={h} className="text-sm text-ink-2">
+                      言われたことの中に：<mark className="mk-yellow">「{h}」</mark>
+                    </p>
+                  ))}
+                  <div className="s-eaq-btns">
+                    {q.answers.map((a) => (
+                      <button key={a.key} type="button" className={`s-choice s-choice-sm ${ea[q.id] === a.key ? 's-choice-on' : ''}`} aria-pressed={ea[q.id] === a.key} onClick={() => setEa((cur) => ({ ...cur, [q.id]: a.key }))}>
+                        {a.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
           </div>
 
           {report.cards.map((c) => (

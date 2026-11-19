@@ -242,3 +242,9 @@ mark.mk-yellow { background: linear-gradient(transparent 45%, #ffe45c 45%); colo
 .s-choice small { font-family: var(--font-ud); font-weight: 400; font-size: 0.8rem; color: var(--color-ink-2); }
 .s-choice-on { background: var(--color-ink); color: var(--color-paper-2); box-shadow: none; transform: translate(3px, 3px); }
 .s-choice-on small { color: var(--color-paper-3); }
+
+.s-eaq { border-top: 1px dashed var(--color-ink); margin-top: 0.8rem; padding-top: 0.7rem; }
+.s-eaq-t { font-weight: 700; font-size: 1.15rem; line-height: 1.5; margin-bottom: 0.4rem; }
+.s-eaq-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+.s-choice-sm { min-height: 3.2rem; font-size: 1.05rem; box-shadow: 2px 2px 0 0 var(--color-ink); }
+.s-choice-sm.s-choice-on { transform: translate(2px, 2px); }
