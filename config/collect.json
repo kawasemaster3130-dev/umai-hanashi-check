@@ -1,5 +1,5 @@
 {
   "note": "利用者の結果を集める先（Google Apps Script のウェブアプリのURL）。空なら何も送らない。tools/collect.gs を参照。",
-  "url": "",
+  "url": "https://script.google.com/macros/s/AKfycbzpJTGAhAy5J68Hn4udmhzORBCZI_rwLyeu3pRsHLTTyM3ZX3EyHSAw3SoNDkfgv8skmg/exec",
   "operator": "このアプリの運営者"
 }
