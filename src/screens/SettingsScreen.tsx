@@ -8,7 +8,8 @@ import { OPTIONAL_ITEMS } from '../data/checklist';
 import { contacts, keywords, links, seller, sellerIncomplete, guides } from '../data/config';
 import { buildAllZip, describePayload, downloadBlob, existingCaseIds, importPayload, readImportFile } from '../app/exportImport';
 import { DEMO_CASE_ID, loadDemoCase } from '../app/demo';
-import { CONSENT_POINTS } from '../components/ConsentModal';
+import { CONSENT_POINTS, ShareChoice } from '../components/ConsentModal';
+import { collectEnabled } from '../logic/collect';
 
 export function SettingsScreen() {
   const settings = useSettings();
@@ -66,6 +67,12 @@ export function SettingsScreen() {
           ))}
         </ul>
       </Section>
+
+      {collectEnabled() && (
+        <Section title="調べた結果を送る">
+          <ShareChoice value={!!settings?.share} onChange={(v) => void saveSettings({ share: v, shareAskedAt: new Date().toISOString() })} />
+        </Section>
+      )}
 
       <Section title="手ごたえ">
         <label className="flex items-center gap-3 text-lg">

@@ -177,6 +177,8 @@ export interface AppSettings {
   aiKey?: string; // 口コミ・うわさをAIに調べさせるためのAPIキー（この端末の中だけ）
   aiModel?: string;
   sound?: boolean; // ボタンの音
+  share?: boolean; // 調べた名前と結果を運営者に送る（同意した人だけ）
+  shareAskedAt?: string; // 送るかどうかを聞いた日時
 }
 
 export const DEFAULT_SETTINGS: AppSettings = { enabledOptionalItems: [] };

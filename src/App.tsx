@@ -3,6 +3,7 @@ import { installGlobalFeel, setSound } from './app/feedback';
 import { HashRouter, Link, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import { Shell } from './components/Layout';
 import { ConsentModal } from './components/ConsentModal';
+import { collectEnabled } from './logic/collect';
 import { useSettings } from './app/hooks';
 import { CaseProvider } from './app/CaseContext';
 import { Spinner } from './components/ui';
@@ -50,6 +51,7 @@ export default function App() {
     <HashRouter>
       <Shell>
         {settings && !settings.consentedAt && <ConsentModal />}
+        {settings && settings.consentedAt && collectEnabled() && !settings.shareAskedAt && <ConsentModal shareOnly />}
         <Routes>
           <Route path="/" element={<QuickScreen />} />
           <Route path="/cases" element={<Home />} />

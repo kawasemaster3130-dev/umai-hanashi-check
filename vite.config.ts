@@ -14,7 +14,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   "img-src 'self' blob: data:",
-  "connect-src 'self' data: blob: https://api.anthropic.com",
+  "connect-src 'self' data: blob: https://api.anthropic.com https://script.google.com https://script.googleusercontent.com",
   "frame-src 'self' blob: data:",
   "object-src 'none'",
   "base-uri 'self'",

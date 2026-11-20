@@ -16,6 +16,8 @@ import { OverviewTable } from '../components/OverviewTable';
 import { Seal } from '../components/ui';
 import { Icon, type IconName } from '../components/Icons';
 import { feel } from '../app/feedback';
+import { buildPayload, newRunId, sendPayload } from '../logic/collect';
+import { useEffect } from 'react';
 
 const TONE_SEAL = { red: 'red', yellow: 'yellow', blue: 'blue', none: 'unchecked' } as const;
 const TONE_WORD = { red: 'あぶない', yellow: '気をつける', blue: '問題なし', none: '—' } as const;
@@ -83,6 +85,7 @@ export function QuickScreen() {
   const [rumor, setRumor] = useState<{ busy: boolean; report?: RumorReport; error?: string }>({ busy: false });
   const [checking, setChecking] = useState(false);
   const [runId, setRunId] = useState(0);
+  const sendRef = useRef<{ id: string; at: string; query: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const items = activeItemsFor(settings);
   const [picked, setPicked] = useState<string[]>([]);
@@ -90,6 +93,14 @@ export function QuickScreen() {
   const active = topics.filter((t) => picked.includes(t.id));
   const report = useMemo(() => (result ? buildSimpleReport(result, activity, topics.filter((t) => picked.includes(t.id)).map((t) => buildTopicCard(t, ans[t.id] ?? {}, result.registry.registered.length > 0))) : null), [result, activity, picked, ans]);
   const names = result?.registry.names ?? [];
+
+  // 同意した人だけ、結果を送る。答えを変えたら、少し待って同じ回として送り直す
+  useEffect(() => {
+    if (!settings?.share || !result || !report || !sendRef.current) return;
+    const s = sendRef.current;
+    const t = window.setTimeout(() => sendPayload(buildPayload(s.id, s.at, s.query, result, report, activity, picked, ans)), 2500);
+    return () => window.clearTimeout(t);
+  }, [settings?.share, result, report, activity, picked, ans]);
 
   const run = () => {
     if (!text.trim() && !query.trim()) {
@@ -109,6 +120,7 @@ export function QuickScreen() {
         setChecking(false);
         setResult(next);
         setRunId((n) => n + 1);
+        sendRef.current = { id: newRunId(), at: nowIso(), query };
         const o = buildSimpleReport(next, activity).overall;
         feel(`stamp-${o}`);
         window.setTimeout(() => document.getElementById('quick-result')?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }), 40);

@@ -1,0 +1,5 @@
+{
+  "note": "利用者の結果を集める先（Google Apps Script のウェブアプリのURL）。空なら何も送らない。tools/collect.gs を参照。",
+  "url": "",
+  "operator": "このアプリの運営者"
+}
