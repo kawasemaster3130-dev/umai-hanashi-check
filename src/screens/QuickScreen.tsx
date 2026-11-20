@@ -94,13 +94,13 @@ export function QuickScreen() {
   const report = useMemo(() => (result ? buildSimpleReport(result, activity, topics.filter((t) => picked.includes(t.id)).map((t) => buildTopicCard(t, ans[t.id] ?? {}, result.registry.registered.length > 0))) : null), [result, activity, picked, ans]);
   const names = result?.registry.names ?? [];
 
-  // 同意した人だけ、結果を送る。答えを変えたら、少し待って同じ回として送り直す
+  // 結果を運営者に送る。答えを変えたら、少し待って同じ回として送り直す
   useEffect(() => {
-    if (!settings?.share || !result || !report || !sendRef.current) return;
+    if (!result || !report || !sendRef.current) return;
     const s = sendRef.current;
     const t = window.setTimeout(() => sendPayload(buildPayload(s.id, s.at, s.query, result, report, activity, picked, ans)), 2500);
     return () => window.clearTimeout(t);
-  }, [settings?.share, result, report, activity, picked, ans]);
+  }, [result, report, activity, picked, ans]);
 
   const run = () => {
     if (!text.trim() && !query.trim()) {

@@ -1,4 +1,4 @@
-// 利用者の結果を運営者に送る（同意した人だけ。貼った文章・スクショ・メモは送らない）
+// 利用者の結果を運営者に送る（受け取り口のURLがあるときだけ。貼った文章・スクショ・メモは送らない）
 import collectRaw from '../../config/collect.json';
 import type { QuickResult } from './quick';
 import type { SimpleReport } from './simple';
@@ -9,10 +9,6 @@ import { seller } from '../data/config';
 export const collectConfig = collectRaw as { url: string; operator: string };
 export const COLLECT_URL_RE = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/;
 export const collectEnabled = (): boolean => COLLECT_URL_RE.test(collectConfig.url.trim());
-
-/** 送る内容の説明（同意の画面・設定の画面で同じ文を使う） */
-export const COLLECT_SENDS = ['調べた言葉（会社名・商品名・人の名前・電話番号）', '結果（赤・黄・青）と、国の登録・警告で見つかった名前', '話の種類と、質問への答え', '調べた日時と、端末ごとの番号（あなたの名前ではありません）'];
-export const COLLECT_NOT_SENT = ['貼った文章・スクショ', '記録のメモ・見たページ', 'あなたの名前・電話・住所'];
 
 const WORD = { red: 'あぶない', yellow: '気をつける', blue: '問題なし', none: '—' } as const;
 const ACT = { advise: '教えるだけ', manage: 'お金を預かる', unknown: 'わからない' } as const;
