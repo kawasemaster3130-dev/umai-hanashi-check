@@ -13,7 +13,7 @@ export const CONSENT_POINTS = [
 ];
 
 export function consentPoints(): string[] {
-  return collectEnabled() ? [...CONSENT_POINTS, `調べた言葉と結果（赤・黄・青）は、${collectConfig.operator}に届きます。貼った文章やスクショは届きません。`] : CONSENT_POINTS;
+  return collectEnabled() ? [...CONSENT_POINTS, `最初の5つの質問の答えと、調べた言葉と結果（赤・黄・青）は、${collectConfig.operator}に届きます。貼った文章やスクショは届きません。`] : CONSENT_POINTS;
 }
 
 export function ConsentModal() {

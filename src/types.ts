@@ -170,8 +170,22 @@ export interface StoredBlob {
   createdAt: string;
 }
 
+/** 最初の5つの質問の答え（金額は万円の数を文字のまま持つ） */
+export interface IntroAnswers {
+  years?: string; // 投資歴
+  products?: string[]; // 投資したことがある商品
+  productsOther?: string;
+  pnlSign?: 'plus' | 'minus' | 'zero' | 'none'; // トータル収支
+  pnlMan?: string;
+  surplusMan?: string; // 投資に回せるお金
+  goalYears?: string; // 今後の目標：何年後
+  goalText?: string; // 今後の目標：どうなっていたいか
+  answeredAt?: string;
+}
+
 export interface AppSettings {
   consentedAt?: string;
+  intro?: IntroAnswers; // 最初の5つの質問（全部答えるまで先に進めない）
   enabledOptionalItems: string[]; // X-1 など
   investigatorDefault?: string;
   aiKey?: string; // 口コミ・うわさをAIに調べさせるためのAPIキー（この端末の中だけ）

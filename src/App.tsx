@@ -18,6 +18,8 @@ import { GuidesScreen } from './screens/GuidesScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { KantanScreen, KantanStart } from './screens/KantanScreen';
 import { QuickScreen } from './screens/QuickScreen';
+import { IntroScreen } from './screens/IntroScreen';
+import { introDone } from './logic/intro';
 
 function CaseLayout() {
   const { id = '' } = useParams();
@@ -46,10 +48,15 @@ export default function App() {
   const settings = useSettings();
   useEffect(() => installGlobalFeel(), []);
   useEffect(() => setSound(!!settings?.sound), [settings?.sound]);
+  // 最初の5つの質問に全部答えるまでは、どの画面にも進めない
+  const gate = !!settings && !introDone(settings.intro);
   return (
     <HashRouter>
-      <Shell>
+      <Shell bare={gate}>
         {settings && !settings.consentedAt && <ConsentModal />}
+        {gate ? (
+          <IntroScreen />
+        ) : (
         <Routes>
           <Route path="/" element={<QuickScreen />} />
           <Route path="/cases" element={<Home />} />
@@ -69,8 +76,10 @@ export default function App() {
             <Route path="next" element={<NextScreen />} />
             <Route path="paid" element={<PaidScreen />} />
           </Route>
+          <Route path="/intro" element={<IntroScreen edit />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        )}
       </Shell>
     </HashRouter>
   );

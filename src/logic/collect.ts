@@ -3,8 +3,10 @@ import collectRaw from '../../config/collect.json';
 import type { QuickResult } from './quick';
 import type { SimpleReport } from './simple';
 import { topics, type TopicAnswers } from './topics';
-import { uuid } from './util';
+import { nowIso, uuid } from './util';
 import { seller } from '../data/config';
+import { introSummary } from './intro';
+import type { IntroAnswers } from '../types';
 
 export const collectConfig = collectRaw as { url: string; operator: string };
 export const COLLECT_URL_RE = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/;
@@ -44,9 +46,40 @@ export interface CollectPayload {
   registered: string;
   warned: string;
   hits: string;
+  // 最初の5つの質問（同じ人の結果の行にも付ける）
+  introYears: string;
+  introProducts: string;
+  introPnl: string;
+  introSurplus: string;
+  introGoal: string;
 }
 
-export function buildPayload(runId: string, checkedAt: string, query: string, r: QuickResult, rep: SimpleReport, activity: keyof typeof ACT, picked: string[], ans: TopicAnswers): CollectPayload {
+/** 最初の5つの質問の答え（シートの「最初の5問」のタブに、端末ごとに1行） */
+export interface IntroPayload {
+  app: 'umai-hanashi-check';
+  kind: 'intro';
+  version: string;
+  device: string;
+  answeredAt: string;
+  years: string;
+  products: string;
+  pnl: string;
+  surplus: string;
+  goalYears: string;
+  goalText: string;
+}
+
+export function buildIntroPayload(a: IntroAnswers): IntroPayload {
+  const s = introSummary(a);
+  return { app: 'umai-hanashi-check', kind: 'intro', version: seller.appVersion, device: deviceId(), answeredAt: a.answeredAt ?? nowIso(), years: s.years, products: s.products, pnl: s.pnl, surplus: s.surplus, goalYears: s.goalYears, goalText: s.goalText };
+}
+
+function introColumns(a: IntroAnswers | undefined): Pick<CollectPayload, 'introYears' | 'introProducts' | 'introPnl' | 'introSurplus' | 'introGoal'> {
+  const s = introSummary(a);
+  return { introYears: s.years, introProducts: s.products, introPnl: s.pnl, introSurplus: s.surplus, introGoal: [s.goalYears, s.goalText].filter(Boolean).join('：') };
+}
+
+export function buildPayload(runId: string, checkedAt: string, query: string, r: QuickResult, rep: SimpleReport, activity: keyof typeof ACT, picked: string[], ans: TopicAnswers, intro?: IntroAnswers): CollectPayload {
   const tone = (k: string) => WORD[rep.cards.find((c) => c.key === k)?.tone ?? 'none'];
   const reds: string[] = [];
   for (const t of topics.filter((x) => picked.includes(x.id))) {
@@ -73,11 +106,12 @@ export function buildPayload(runId: string, checkedAt: string, query: string, r:
     registered: r.registry.registered.map((e) => `${e.name}（${e.no}）`).join('\n'),
     warned: r.registry.warned.map((w) => `${w.name}（${w.when ?? ''}）`).join('\n'),
     hits: r.hits.map((h) => h.label).join('、'),
+    ...introColumns(intro),
   };
 }
 
 /** 送る（失敗しても利用者には何もしない） */
-export function sendPayload(p: CollectPayload): void {
+export function sendPayload(p: CollectPayload | IntroPayload): void {
   if (!collectEnabled()) return;
   try {
     void fetch(collectConfig.url.trim(), { method: 'POST', mode: 'no-cors', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify(p), keepalive: true }).catch(() => undefined);

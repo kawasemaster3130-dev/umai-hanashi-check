@@ -13,7 +13,7 @@ const TABS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/settings', label: '設定', icon: 'gear' },
 ];
 
-export function Shell({ children }: { children: ReactNode }) {
+export function Shell({ children, bare = false }: { children: ReactNode; bare?: boolean }) {
   const online = useOnline();
   return (
     <div className="min-h-screen">
@@ -23,6 +23,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <span className="mr-2 hidden border border-paper-2 px-1 align-middle text-[0.65rem] tracking-widest sm:inline-block">点検票</span>
             うまい話チェック
           </NavLink>
+          {!bare && (
           <nav className="mincho hidden shrink-0 items-center gap-1 text-sm sm:flex" aria-label="メニュー">
             {TABS.map((t) => (
               <NavLink key={t.to} to={t.to} end={t.end} className={({ isActive }) => `top-link ${t.to === '/' ? 'top-link-check' : ''} ${isActive ? 'is-on' : ''}`}>
@@ -31,10 +32,12 @@ export function Shell({ children }: { children: ReactNode }) {
               </NavLink>
             ))}
           </nav>
+          )}
         </div>
       </header>
       {!online && <div className="sticky top-[var(--hdr)] z-10 bg-ocher-bg px-4 py-1 text-center text-xs text-ink">オフラインです。入力・保存・判定の1枚の表示はできます。外のサイトは開けません。</div>}
       <main className="mx-auto w-full max-w-5xl px-4 py-4 pb-32 sm:pb-16">{children}</main>
+      {!bare && (
       <nav className="tab-bar sm:hidden" aria-label="メニュー">
         {TABS.map((t) => (
           <NavLink key={t.to} to={t.to} end={t.end} className={({ isActive }) => `tab-item ${isActive ? 'is-on' : ''}`}>
@@ -45,6 +48,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </NavLink>
         ))}
       </nav>
+      )}
     </div>
   );
 }

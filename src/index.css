@@ -384,3 +384,30 @@ mark.mk-yellow { background: linear-gradient(transparent 45%, #ffe45c 45%); colo
 .s-ask-q { letter-spacing: 0.02em; }
 @media (min-width: 640px) { .tab-bar { display: none; } }
 .s-tile { font-size: 1.05rem; line-height: 1.35; word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 最初の5つの質問 */
+.intro-q { display: flex; flex-direction: column; gap: 0.7rem; scroll-margin-top: 4.5rem; }
+.intro-q-todo { border-left: 6px solid var(--color-shu); }
+.intro-head { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.intro-head .s-ask-q { margin-bottom: 0; display: flex; align-items: center; gap: 0.5rem; }
+.intro-no { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 2rem; height: 2rem; background: var(--color-ink); color: var(--color-paper-2); font-family: var(--font-mono); font-weight: 600; font-size: 1.05rem; }
+.intro-mi { flex: none; font-size: 0.85rem; font-weight: 700; color: var(--color-shu); border: 1px solid var(--color-shu); padding: 0.05rem 0.4rem; background: var(--color-paper-2); }
+.intro-sub { display: block; font-size: 1.05rem; line-height: 1.6; color: var(--color-ink-2); }
+.intro-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+@media (min-width: 560px) { .intro-grid { grid-template-columns: repeat(3, 1fr); } }
+.intro-grid .s-choice { word-break: keep-all; overflow-wrap: anywhere; line-height: 1.3; text-align: center; }
+.intro-input { width: 100%; background: var(--color-paper-2); border: 2px solid var(--color-ink); padding: 0.75rem 0.9rem; font-size: 1.3rem; color: var(--color-ink); font-family: var(--font-ud); }
+.intro-input:focus { outline: none; border-color: var(--color-shu); box-shadow: 3px 3px 0 0 var(--color-shu); }
+.intro-input::placeholder { color: var(--color-ink-3); font-size: 1.05rem; }
+.intro-text { resize: vertical; min-height: 6.5rem; line-height: 1.6; font-size: 1.15rem; }
+.intro-amount, .intro-years { display: flex; align-items: center; gap: 0.6rem; }
+.intro-amount .intro-input { font-family: var(--font-mono); font-weight: 600; text-align: right; }
+.intro-input-s { max-width: 7rem; font-family: var(--font-mono); font-weight: 600; text-align: right; }
+.intro-unit { flex: none; font-family: var(--font-mincho); font-weight: 800; font-size: 1.25rem; }
+.intro-yen { margin-top: 0.35rem; font-size: 1rem; color: var(--color-ink-2); font-family: var(--font-mono); }
+.intro-err { margin-top: 0.35rem; font-size: 1rem; font-weight: 700; color: var(--color-shu); }
+.intro-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.intro-chip { min-height: 2.8rem; padding: 0.3rem 0.9rem; border: 1.5px solid var(--color-ink); background: var(--color-paper-2); font-family: var(--font-mincho); font-weight: 800; font-size: 1.05rem; box-shadow: 2px 2px 0 0 var(--color-ink); }
+.intro-chip.is-on { background: var(--color-ink); color: var(--color-paper-2); box-shadow: none; transform: translate(2px, 2px); }
+.k-btn[aria-disabled="true"] { background: var(--color-paper-3); color: var(--color-ink-2); box-shadow: 2px 2px 0 0 var(--color-ink-3); border-color: var(--color-ink-3); }
+.intro-left { display: block; font-family: var(--font-ud); font-weight: 400; font-size: 0.95rem; letter-spacing: 0; margin-top: 0.2rem; }

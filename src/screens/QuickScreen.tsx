@@ -98,9 +98,9 @@ export function QuickScreen() {
   useEffect(() => {
     if (!result || !report || !sendRef.current) return;
     const s = sendRef.current;
-    const t = window.setTimeout(() => sendPayload(buildPayload(s.id, s.at, s.query, result, report, activity, picked, ans)), 2500);
+    const t = window.setTimeout(() => sendPayload(buildPayload(s.id, s.at, s.query, result, report, activity, picked, ans, settings?.intro)), 2500);
     return () => window.clearTimeout(t);
-  }, [result, report, activity, picked, ans]);
+  }, [result, report, activity, picked, ans, settings?.intro]);
 
   const run = () => {
     if (!text.trim() && !query.trim()) {

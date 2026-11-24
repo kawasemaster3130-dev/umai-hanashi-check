@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PageTitle } from '../components/Layout';
 import { Section } from '../components/ui';
 import { useCases, useSettings, ctxFor } from '../app/hooks';
@@ -9,6 +9,7 @@ import { contacts, keywords, links, seller, sellerIncomplete, guides } from '../
 import { buildAllZip, describePayload, downloadBlob, existingCaseIds, importPayload, readImportFile } from '../app/exportImport';
 import { DEMO_CASE_ID, loadDemoCase } from '../app/demo';
 import { consentPoints } from '../components/ConsentModal';
+import { INTRO_TITLES, introSummary } from '../logic/intro';
 
 export function SettingsScreen() {
   const settings = useSettings();
@@ -41,6 +42,33 @@ export function SettingsScreen() {
   return (
     <div className="space-y-4">
       <PageTitle title="設定・このアプリについて" />
+
+      <Section
+        title="最初の5つの質問"
+        right={
+          <Link to="/intro" className="btn-secondary btn-sm">
+            答えを直す
+          </Link>
+        }
+      >
+        {(() => {
+          const s = introSummary(settings?.intro);
+          const vals = [s.years, s.products, s.pnl, s.surplus, [s.goalYears, s.goalText].filter(Boolean).join('：')];
+          return (
+            <dl className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[13rem_1fr]">
+              {INTRO_TITLES.map((t, i) => (
+                <div key={t} className="contents">
+                  <dt className="font-semibold">
+                    {i + 1}. {t}
+                  </dt>
+                  <dd className="whitespace-pre-wrap">{vals[i] || '—'}</dd>
+                </div>
+              ))}
+            </dl>
+          );
+        })()}
+        <p className="text-xs text-ink-3">答えた日：{settings?.intro?.answeredAt ? new Date(settings.intro.answeredAt).toLocaleString('ja-JP') : '—'}</p>
+      </Section>
 
       <Section title="追加項目（原本にない提案。既定は無効）">
         <p className="text-sm text-ink-2">有効にすると、チェック表に項目が増えます（原本の41項目と数が合わなくなります）。作者の確認後に有効化してください。</p>
